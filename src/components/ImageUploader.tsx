@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 
-export const ImageUploader: React.FC = () => {
+interface ImageUploaderProps {
+  onProcessComplete: () => void;
+}
+
+export const ImageUploader: React.FC<ImageUploaderProps> = ({ onProcessComplete }) => {
   const [isHovering, setIsHovering] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -16,6 +22,24 @@ export const ImageUploader: React.FC = () => {
     if (e.target.files && e.target.files.length > 0) {
       setFiles(Array.from(e.target.files));
     }
+  };
+
+  const handleProcess = () => {
+    setIsProcessing(true);
+    setProgress(0);
+    
+    // Simulate local QC formatting & checks
+    let currentProgress = 0;
+    const interval = setInterval(() => {
+      currentProgress += 10;
+      setProgress(currentProgress);
+      
+      if (currentProgress >= 100) {
+        clearInterval(interval);
+        setIsProcessing(false);
+        onProcessComplete();
+      }
+    }, 200);
   };
 
   return (
@@ -46,16 +70,30 @@ export const ImageUploader: React.FC = () => {
         />
       </div>
 
-      {files.length > 0 && (
-        <div className="upload-stats animate-fade-in" style={{ padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: 'var(--radius-md)' }}>
+      {files.length > 0 && !isProcessing && (
+        <div className="upload-stats animate-fade-in" style={{ padding: '1rem', background: 'rgba(5, 150, 105, 0.1)', borderRadius: 'var(--radius-md)' }}>
           <p style={{ margin: 0, fontWeight: 500, color: 'var(--accent-green)' }}>
             ✓ {files.length} images queued for validation
           </p>
         </div>
       )}
 
-      <button className="btn btn-primary" style={{ width: '100%' }} disabled={files.length === 0}>
-        Process Batch Validation
+      {isProcessing && (
+        <div style={{ padding: '1rem', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
+          <p style={{ margin: '0 0 0.5rem 0', fontWeight: 500 }}>Scanning Phase A Critical Targets...</p>
+          <div style={{ width: '100%', height: '8px', background: 'var(--border-color)', borderRadius: '4px', overflow: 'hidden' }}>
+            <div style={{ width: `${progress}%`, height: '100%', background: 'var(--accent-blue)', transition: 'width 0.2s ease' }} />
+          </div>
+        </div>
+      )}
+
+      <button 
+        className="btn btn-primary" 
+        style={{ width: '100%' }} 
+        disabled={files.length === 0 || isProcessing}
+        onClick={handleProcess}
+      >
+        {isProcessing ? 'Processing Batch...' : 'Process Batch Validation'}
       </button>
     </div>
   );

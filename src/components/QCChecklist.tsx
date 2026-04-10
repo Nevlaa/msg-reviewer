@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const QCChecklist: React.FC = () => {
+export const QCChecklist: React.FC<{ hasParsedReport?: boolean }> = ({ hasParsedReport }) => {
   return (
     <div className="card panel">
       <div className="card-header">
@@ -22,7 +22,11 @@ export const QCChecklist: React.FC = () => {
         </li>
         <li style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
           <span>🍎 Staple Food Base</span>
-          <span style={{ color: 'var(--text-secondary)' }}>Pending Checks</span>
+          {hasParsedReport ? (
+            <span style={{ color: 'var(--accent-green)', fontWeight: 600 }}>✓ Verified via Gem</span>
+          ) : (
+            <span style={{ color: 'var(--text-secondary)' }}>Pending Gemini Schema</span>
+          )}
         </li>
       </ul>
     </div>
