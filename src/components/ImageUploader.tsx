@@ -19,7 +19,7 @@ export const ImageUploader: React.FC = () => {
   };
 
   return (
-    <div className="card glass-panel">
+    <div className="card panel">
       <div className="card-header">
         <h2>Batch Image Review</h2>
         <p>Upload up to 70 JPEGs simultaneously.</p>

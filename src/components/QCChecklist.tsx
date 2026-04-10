@@ -2,7 +2,7 @@ import React from 'react';
 
 export const QCChecklist: React.FC = () => {
   return (
-    <div className="card glass-panel" style={{ background: 'var(--bg-secondary)' }}>
+    <div className="card panel">
       <div className="card-header">
         <h2>15-Point Critical Status</h2>
         <p>Phase A validation overview.</p>
