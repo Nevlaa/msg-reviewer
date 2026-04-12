@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SNAPScanReport } from '../types';
+import type { SNAPScanReport } from '../types';
 
 interface JSONImporterProps {
   onImportComplete: (report: SNAPScanReport) => void;

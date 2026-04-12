@@ -1,5 +1,5 @@
 import React from 'react';
-import { SNAPScanReport, FoodItem } from '../types';
+import type { SNAPScanReport, FoodItem } from '../types';
 
 interface DashboardProps {
   report: SNAPScanReport;
