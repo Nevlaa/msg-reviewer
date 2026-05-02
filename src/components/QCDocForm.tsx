@@ -265,9 +265,61 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate, isAiRunnin
         </div>
       )}
 
+      {/* SALESFORCE PHOTO MANIFEST */}
+      {data?.results?.photo_manifest && (
+        <details open className="qc-box mt-15" style={{ background: '#0f172a', border: '1px solid #334155' }}>
+          <summary style={{ cursor: 'pointer', color: '#94a3b8', fontWeight: 'bold', padding: '0.75rem', fontSize: '0.85rem' }}>
+            📂 SALESFORCE PHOTO MANIFEST ({data.results.photo_manifest.length} files fetched)
+          </summary>
+          <div style={{ padding: '0 0.75rem 0.75rem', overflow: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.7rem', color: '#e2e8f0' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #475569' }}>
+                  <th style={{ padding: '6px', textAlign: 'left', color: '#94a3b8' }}>#</th>
+                  <th style={{ padding: '6px', textAlign: 'left', color: '#94a3b8' }}>Title</th>
+                  <th style={{ padding: '6px', textAlign: 'left', color: '#94a3b8' }}>PathOnClient</th>
+                  <th style={{ padding: '6px', textAlign: 'left', color: '#94a3b8' }}>Description</th>
+                  <th style={{ padding: '6px', textAlign: 'left', color: '#94a3b8' }}>Tags</th>
+                  <th style={{ padding: '6px', textAlign: 'left', color: '#94a3b8' }}>Ext</th>
+                  <th style={{ padding: '6px', textAlign: 'left', color: '#94a3b8' }}>Size</th>
+                  <th style={{ padding: '6px', textAlign: 'left', color: '#94a3b8' }}>PublishLocation</th>
+                  <th style={{ padding: '6px', textAlign: 'left', color: '#94a3b8' }}>Batch</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.results.photo_manifest.map((p: any) => (
+                  <tr key={p.index} style={{ borderBottom: '1px solid #1e293b' }}>
+                    <td style={{ padding: '4px 6px' }}>{p.index}</td>
+                    <td style={{ padding: '4px 6px', fontFamily: 'monospace' }}>{p.title || '—'}</td>
+                    <td style={{ padding: '4px 6px', fontFamily: 'monospace', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.path || '—'}</td>
+                    <td style={{ padding: '4px 6px' }}>{p.description || '—'}</td>
+                    <td style={{ padding: '4px 6px' }}>{p.tags || '—'}</td>
+                    <td style={{ padding: '4px 6px' }}>{p.extension}</td>
+                    <td style={{ padding: '4px 6px' }}>{p.size ? `${Math.round(p.size / 1024)}KB` : '—'}</td>
+                    <td style={{ padding: '4px 6px', fontFamily: 'monospace', fontSize: '0.6rem' }}>{p.publishLocation || '—'}</td>
+                    <td style={{ padding: '4px 6px' }}>
+                      <span style={{ 
+                        padding: '2px 6px', 
+                        borderRadius: '4px', 
+                        fontSize: '0.65rem',
+                        fontWeight: 'bold',
+                        background: p.batch === 'INVENTORY' ? '#065f46' : p.batch === 'CRITICAL' ? '#92400e' : '#7f1d1d',
+                        color: 'white'
+                      }}>
+                        {p.batch}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
+      )}
+
       {/* RAW AI RESPONSE JSON PANEL */}
       {data?.results?.ai_raw_response && (
-        <details className="qc-box mt-15" style={{ background: '#0f172a', border: '1px solid #334155' }}>
+        <details open className="qc-box mt-15" style={{ background: '#0f172a', border: '1px solid #334155' }}>
           <summary style={{ cursor: 'pointer', color: '#94a3b8', fontWeight: 'bold', padding: '0.75rem', fontSize: '0.85rem' }}>
             🔍 RAW AI RESPONSE JSON ({data.results.ai_raw_response.photos_analyzed} photos analyzed, {data.results.ai_raw_response.inventory?.length || 0} items found)
           </summary>

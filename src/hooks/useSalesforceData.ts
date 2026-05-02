@@ -558,6 +558,19 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
           },
           food_inventory: updatedInventory,
           scanned_photos: inventoryPhotos.map(p => p.Base64),
+          photo_manifest: photos.map((p: any, i: number) => ({
+            index: i,
+            title: p.Title,
+            path: p.PathOnClient,
+            description: p.Description,
+            tags: p.TagCsv,
+            extension: p.FileExtension,
+            size: p.ContentSize,
+            publishLocation: p.FirstPublishLocationId,
+            batch: criticalKeywords.some(kw => photoHasTag(p, kw)) ? 'CRITICAL' 
+              : imageExtensions.includes((p.FileExtension || '').toLowerCase()) ? 'INVENTORY' 
+              : 'SKIPPED (non-image)'
+          })),
           ai_raw_response: {
             inventory: aiInventory,
             evidence_found: aiEvidence,

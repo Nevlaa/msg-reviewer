@@ -95,13 +95,13 @@ export class SalesforceService {
     const docIds = linkResponse.records.map((r: any) => `'${r.ContentDocumentId}'`).join(',');
     
     // 2. Get the actual Latest Versions of those documents
-    const versionQuery = `SELECT Id, Title, Description, FileExtension, ContentSize, TagCsv, VersionData FROM ContentVersion WHERE ContentDocumentId IN (${docIds}) AND IsLatest = true`;
+    const versionQuery = `SELECT Id, Title, Description, PathOnClient, FileExtension, ContentSize, TagCsv, FirstPublishLocationId, VersionData FROM ContentVersion WHERE ContentDocumentId IN (${docIds}) AND IsLatest = true`;
     const versionResponse = await this.fetchFromSalesforce<any>(`/services/data/v60.0/query?q=${encodeURIComponent(versionQuery)}`);
     
     console.log(`SALESFORCE: Found ${versionResponse.records?.length || 0} total photos via links.`);
-    // Log available metadata for debugging
+    // Log ALL available metadata for debugging
     versionResponse.records?.forEach((r: any, i: number) => {
-      console.log(`  Photo ${i}: Title="${r.Title}" Desc="${r.Description || ''}" Tags="${r.TagCsv || ''}" Ext=${r.FileExtension}`);
+      console.log(`  Photo ${i}: Title="${r.Title}" Path="${r.PathOnClient || ''}" Desc="${r.Description || ''}" Tags="${r.TagCsv || ''}" Ext=${r.FileExtension} Size=${r.ContentSize} PublishLoc=${r.FirstPublishLocationId || ''}`);
     });
     return versionResponse.records || [];
   }
