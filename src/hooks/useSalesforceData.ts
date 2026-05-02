@@ -400,10 +400,14 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
       setAiStatus('Phase 3: Scanning Food Inventory for variety counts...');
       setAiProgress(70);
       console.log("AI: Processing Batch 2 (Food Inventory)...");
-      // Send ALL photos except those identified as critical documents in Batch 1
+      // Send ALL image files except those identified as critical documents in Batch 1
       const criticalKeywords = ['consent', 'sketch', 'exterior'];
+      const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'bmp'];
       const inventoryPhotos = photos.filter(p => {
-        return !criticalKeywords.some(kw => photoHasTag(p, kw));
+        const ext = (p.FileExtension || '').toLowerCase();
+        const isImage = imageExtensions.includes(ext);
+        const isCritical = criticalKeywords.some(kw => photoHasTag(p, kw));
+        return isImage && !isCritical;
       }).slice(0, 50);
       console.log(`AI: Sending ${inventoryPhotos.length} of ${photos.length} photos to inventory sweep (excluded ${photos.length - inventoryPhotos.length} critical).`);
 
