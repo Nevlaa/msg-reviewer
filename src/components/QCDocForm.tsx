@@ -229,13 +229,28 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate, isAiRunnin
                 </thead>
                 <tbody>
                   {data?.results?.food_inventory?.map((item: any, idx: number) => {
-                    const count = parseInt(item.actual_found) || 0;
-                    const countStr = item.actual_found || '—';
+                    const aiCountNum = parseInt(item.actual_found) || 0;
+                    const sfCountNum = parseInt(item.expected) || 0;
+                    
+                    // "Close enough" logic: 
+                    // 1. Exact match
+                    // 2. Both are high volume (10+ or 20+)
+                    // 3. Within +/- 2 units
+                    const isCountClose = 
+                      item.actual_found === item.expected ||
+                      (item.actual_found?.includes('+') && item.expected?.includes('+')) ||
+                      Math.abs(aiCountNum - sfCountNum) <= 2;
+
                     const hasMatch = item.match && item.ai_match_name;
-                    const meetsThreshold = count >= 3 || item.actual_found === '10+' || item.actual_found === '20+';
+                    
+                    // 3x3/Threshold compliance: At least 3 units (or high volume)
+                    const meetsMinThreshold = aiCountNum >= 3 || (item.actual_found && item.actual_found.includes('+'));
+                    
                     const needsFFR = item.should_be_ffr;
                     const ffrOk = !needsFFR || item.ai_ffr_found;
-                    const rowPass = hasMatch && meetsThreshold && ffrOk;
+                    
+                    // A row is "Verified" if there's a match, the count is close to the reviewer, AND FFR matches
+                    const rowPass = hasMatch && isCountClose && ffrOk;
                     
                     return (
                       <tr key={idx} style={{ 
@@ -252,13 +267,13 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate, isAiRunnin
                         </td>
                         <td style={{ padding: '5px 6px', textAlign: 'center', fontWeight: 'bold' }}>
                           <span style={{ 
-                            color: meetsThreshold ? '#059669' : '#dc2626',
-                            background: meetsThreshold ? '#d1fae5' : '#fee2e2',
+                            color: isCountClose ? '#059669' : '#dc2626',
+                            background: isCountClose ? '#d1fae5' : '#fee2e2',
                             padding: '1px 6px',
                             borderRadius: '3px',
                             fontSize: '0.7rem'
                           }}>
-                            {countStr}
+                            {item.actual_found || '—'}
                           </span>
                         </td>
                         <td style={{ padding: '5px 6px', textAlign: 'center' }}>
@@ -269,7 +284,7 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate, isAiRunnin
                           )}
                         </td>
                         <td style={{ padding: '5px 6px', textAlign: 'center', fontSize: '0.85rem' }}>
-                          {hasMatch && meetsThreshold ? '✅' : '❌'}
+                          {hasMatch && meetsMinThreshold ? '✅' : '❌'}
                         </td>
                         <td style={{ padding: '5px 6px' }}>
                           {item.source_photo ? (
