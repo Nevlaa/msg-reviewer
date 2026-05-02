@@ -72,16 +72,36 @@ export class VisionService {
    */
   async analyzeInventory(imageParts: any[], expectedCategories: any[]): Promise<any> {
     const prompt = `You are a SENIOR LEVEL 3 QC AUDITOR performing a USDA SNAP 3x3 VARIETY COUNT audit.
+    
+    CRITICAL TAXONOMY RULES (Use these categories ONLY):
+    1. "Bread/Cereals": 
+       - Flours/Grains: Rice, Quinoa, Barley, Buckwheat, Oats, Millet, Teff, Wheat/Corn Flour.
+       - Baked: Bagels, Loaf Bread, Buns/Rolls, Pitas/Naan, Tortillas.
+       - Cereals: Cold/Hot Cereals, Grits, Oatmeal, Infant Cereals.
+       - Pasta: Pasta/Ramen, Rice Noodles.
+       - *Include: Ritz, Saltines, Cookies, Donuts, Pastries, Little Debbie.*
+
+    2. "Dairy": 
+       - Dairy: Milk, Cheese, Yogurt, Butter, Sour Cream, Ghee.
+       - Plant-Based: Almond/Soy/Oat/Coconut/Rice/Cashew Milk & Yogurt & Cheese.
+       - Other: Dairy nutrition bars, Infant Formula (Dairy/Soy), Margarine.
+
+    3. "Meat/Poultry/Fish": 
+       - Land: Beef, Chicken, Pork, Turkey, Lamb, Goat, Duck, Rabbit, Venison, Bison, Camel, Kangaroo.
+       - Seafood: Salmon, Tuna, Shrimp, Tilapia, Cod, Catfish, Crab, Lobster, Oysters, Sardines, Swai, Trout, Whiting.
+       - Eggs: Chicken/Duck/Quail Eggs.
+       - *Include: Jerky (Slim Jim, Jack Link's), SPAM, Vienna Sausages, Canned Meats.*
+
+    4. "Fruit/Veg": 
+       - Fruit: Apples, Bananas, Oranges, Berries, Grapes, Mangoes, Melons, Pineapple, Peaches, Pears, Plantains, Dragon Fruit, Kiwi.
+       - Veg: Tomatoes, Potatoes, Onions, Peppers, Corn, Carrots, Broccoli, Lettuce, Mushrooms, Beans/Soy, Peas, Kale, Spinach.
+       - *Include: 100% Juice, Canned/Frozen Fruits & Veg.*
 
     STEP 1: INVENTORY & UNIT COUNTING (CRITICAL)
     - Survey list to verify: ${expectedCategories.join(", ")}.
-    - For EVERY distinct food variety visible, count units on shelves.
+    - For EVERY distinct variety visible, count units on shelves.
     - If stacked or in rows, assume depth — use "10+" if more than 10.
     - DISTINCT VARIETY RULE: Whole Milk vs 2% Milk = 2 varieties. White Bread vs Wheat Bread = 2 varieties.
-    - Slim Jim, Jack Link's, beef sticks = JERKY = counts as Meat/Poultry/Fish variety.
-    - SPAM, canned chicken, Vienna sausages, canned tuna = Meat/Poultry/Fish variety.
-    - Crackers (Ritz, Saltines), cookies, donuts, pastries, Little Debbie = Bread/Cereals variety.
-    - For EACH item set "category" to one of: "Bread/Cereals", "Dairy", "Meat/Poultry/Fish", "Fruit/Veg".
     - Set ffr_found=true if item is inside a cooler, fridge, or freezer.
     
     STEP 2: STAPLE AREA EVIDENCE (scan ALL photos)
