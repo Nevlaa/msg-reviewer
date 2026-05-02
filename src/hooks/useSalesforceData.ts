@@ -341,8 +341,16 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
       // 1. Fetch Photos
       setAiStatus('Retrieving store visit photos...');
       const photos = await service.getSurveyPhotos(activeIds.surveyId, activeIds.inventoryId);
-      setAiProgress(30);
+      setAiProgress(25);
       console.log(`AI: Found ${photos.length} total photos. Starting Two-Phase Audit...`);
+
+      // 2. Fetch Survey record (needed for consent/sketch links and FNS verification)
+      setAiStatus('Loading survey data for verification...');
+      const survey = await service.getSurvey(activeIds.surveyId);
+      const consentLink = survey.Consent_Form_Link__c;
+      const sketchLink = survey.Sketch_Link__c;
+      console.log(`AI: Survey links — Consent: ${consentLink ? 'YES' : 'NONE'}, Sketch: ${sketchLink ? 'YES' : 'NONE'}`);
+      setAiProgress(30);
 
       // ---------------------------------------------------------
       // BATCH 1: CRITICAL EVIDENCE (Consent, Sketch, Exterior, OV, CO)
@@ -357,16 +365,48 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
         return searchable.includes(keyword);
       };
 
+      // Helper: fetch an image from a direct Salesforce URL and convert to base64
+      const fetchImageFromLink = async (url: string): Promise<{ base64: string; part: any } | null> => {
+        if (!url) return null;
+        try {
+          const response = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${bearerToken}` }
+          });
+          if (!response.ok) return null;
+          const blob = await response.blob();
+          const base64 = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+          const mimeType = blob.type || 'image/jpeg';
+          return {
+            base64: `data:${mimeType};base64,${base64}`,
+            part: { inlineData: { data: base64, mimeType } }
+          };
+        } catch (err) {
+          console.warn('AI: Failed to fetch image from direct link:', url, err);
+          return null;
+        }
+      };
+
+      // Use direct survey links for consent/sketch; fall back to photo manifest search
+      const consentFromLink = await fetchImageFromLink(consentLink);
+      const sketchFromLink = await fetchImageFromLink(sketchLink);
+      
+      console.log(`AI: Consent from direct link: ${!!consentFromLink}, Sketch from direct link: ${!!sketchFromLink}`);
+
       const criticalPhotos = {
-        consent: photos.find(p => photoHasTag(p, 'consent')),
-        sketch: photos.find(p => photoHasTag(p, 'sketch')),
+        consent: consentFromLink ? null : photos.find(p => photoHasTag(p, 'consent')),
+        sketch: sketchFromLink ? null : photos.find(p => photoHasTag(p, 'sketch')),
         exterior: photos.find(p => photoHasTag(p, 'exterior')),
         overviews: photos.filter(p => photoHasTag(p, 'overview')).slice(0, 3),
         checkouts: photos.filter(p => photoHasTag(p, 'checkout') || photoHasTag(p, 'register')).slice(0, 3)
       };
 
-      const criticalCount = [criticalPhotos.consent, criticalPhotos.sketch, criticalPhotos.exterior].filter(Boolean).length;
-      console.log(`AI: Critical photos found by metadata: ${criticalCount}/3 (consent: ${!!criticalPhotos.consent}, sketch: ${!!criticalPhotos.sketch}, exterior: ${!!criticalPhotos.exterior})`);
+      const criticalCount = [consentFromLink || criticalPhotos.consent, sketchFromLink || criticalPhotos.sketch, criticalPhotos.exterior].filter(Boolean).length;
+      console.log(`AI: Critical photos resolved: ${criticalCount}/3 (consent: ${!!(consentFromLink || criticalPhotos.consent)}, sketch: ${!!(sketchFromLink || criticalPhotos.sketch)}, exterior: ${!!criticalPhotos.exterior})`);
 
       const convertToPart = async (p: any) => {
         if (!p) return null;
@@ -377,14 +417,13 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
       };
 
       const criticalParts = {
-        consent: await convertToPart(criticalPhotos.consent),
-        sketch: await convertToPart(criticalPhotos.sketch),
+        consent: consentFromLink?.part || await convertToPart(criticalPhotos.consent),
+        sketch: sketchFromLink?.part || await convertToPart(criticalPhotos.sketch),
         exterior: await convertToPart(criticalPhotos.exterior),
         overviews: await Promise.all(criticalPhotos.overviews.map(convertToPart)),
         checkouts: await Promise.all(criticalPhotos.checkouts.map(convertToPart))
       };
 
-      const survey = await service.getSurvey(activeIds.surveyId);
       const expectedFns = getVal(survey, mapping.survey_object.fields.fns_number);
       const expectedStore = getVal(survey, mapping.survey_object.fields.store_name);
 
@@ -580,12 +619,14 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
           sketch_validation: {
             ...validationLog.results.sketch_validation,
             sop_compliant: isSketchPass,
-            findings: criticalFindings?.sketch
+            findings: criticalFindings?.sketch,
+            source_photo: sketchFromLink?.base64 || criticalPhotos.sketch?.Base64
           },
           consent_form: {
             ...validationLog.results.consent_form,
             status: isConsentPass ? "Compliant" : "Needs Review",
-            findings: criticalFindings?.consent
+            findings: criticalFindings?.consent,
+            source_photo: consentFromLink?.base64 || criticalPhotos.consent?.Base64
           }
         },
         suggested_qc_scores: {
