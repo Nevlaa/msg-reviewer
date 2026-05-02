@@ -390,11 +390,13 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
       setAiStatus('Phase 3: Scanning Food Inventory for variety counts...');
       setAiProgress(70);
       console.log("AI: Processing Batch 2 (Food Inventory)...");
-      const inventoryPhotos = photos.filter(p => 
-        p.Title.toLowerCase().includes('food') || 
-        p.Title.toLowerCase().includes('cooler') ||
-        p.Title.toLowerCase().includes('shelf')
-      ).slice(0, 50);
+      // Send ALL photos except those already processed in Batch 1
+      const criticalTitles = ['consent', 'sketch', 'exterior'];
+      const inventoryPhotos = photos.filter(p => {
+        const titleLower = p.Title.toLowerCase();
+        return !criticalTitles.some(ct => titleLower.includes(ct));
+      }).slice(0, 50);
+      console.log(`AI: Sending ${inventoryPhotos.length} inventory/area photos to vision engine.`);
 
       const inventoryParts = await Promise.all(inventoryPhotos.map(convertToPart));
       const expectedList = validationLog.results.food_inventory.map(i => i.item);
@@ -466,17 +468,19 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
           i.category === category && i.actual_found !== "Pending AI Scan" && (parseInt(i.actual_found) >= 3 || i.actual_found === '10+')
         );
 
-        // Also count AI-discovered varieties by category alias
+        // Also count AI-discovered varieties by direct category match OR keyword alias
         const catAliases: Record<string, string[]> = {
-          'Bread/Cereals': ['bread', 'cereal', 'pastry', 'cake', 'donut', 'muffin', 'cracker', 'cookie', 'granola', 'oatmeal', 'tortilla', 'roll'],
-          'Dairy': ['milk', 'cheese', 'yogurt', 'butter', 'cream', 'egg', 'dairy'],
-          'Meat/Poultry/Fish': ['meat', 'chicken', 'beef', 'pork', 'fish', 'turkey', 'sausage', 'ham', 'spam', 'tuna', 'salmon', 'jerky'],
-          'Fruit/Veg': ['fruit', 'vegetable', 'apple', 'banana', 'orange', 'tomato', 'lettuce', 'potato', 'carrot', 'onion', 'grape']
+          'Bread/Cereals': ['bread', 'cereal', 'pastry', 'cake', 'donut', 'muffin', 'cracker', 'cookie', 'granola', 'oatmeal', 'tortilla', 'roll', 'ritz', 'saltine', 'little debbie'],
+          'Dairy': ['milk', 'cheese', 'yogurt', 'butter', 'cream', 'egg', 'dairy', 'margarine'],
+          'Meat/Poultry/Fish': ['meat', 'chicken', 'beef', 'pork', 'fish', 'turkey', 'sausage', 'ham', 'spam', 'tuna', 'salmon', 'jerky', 'slim jim', 'jack link', 'vienna', 'hot dog', 'bologna', 'pepperoni'],
+          'Fruit/Veg': ['fruit', 'vegetable', 'apple', 'banana', 'orange', 'tomato', 'lettuce', 'potato', 'carrot', 'onion', 'grape', 'corn', 'bean', 'pea']
         };
         const aliases = catAliases[category] || [];
         
         const aiVarietiesForCat = aiInventory.filter((f: any) => {
-          const fLower = f.item.toLowerCase();
+          // Match by explicit AI category OR by keyword alias
+          if (f.category && f.category === category) return true;
+          const fLower = (f.item || '').toLowerCase();
           return aliases.some(alias => fLower.includes(alias));
         });
 
@@ -484,11 +488,12 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
         const totalVarieties = Math.max(sfVarieties.length, aiVarietiesForCat.length);
         const passed = totalVarieties >= 3;
 
+        const aiItemNames = aiVarietiesForCat.map((f: any) => f.item).slice(0, 5).join(', ');
         return {
           status: passed,
           reasoning: passed 
-            ? `Confirmed ${totalVarieties} varieties with 3+ units (SF: ${sfVarieties.length}, AI: ${aiVarietiesForCat.length}).` 
-            : `Only found ${totalVarieties} qualifying varieties (need 3). SF matched: ${sfVarieties.length}, AI found: ${aiVarietiesForCat.length}.`
+            ? `✅ ${totalVarieties} varieties confirmed (SF: ${sfVarieties.length}, AI: ${aiVarietiesForCat.length}). AI found: ${aiItemNames || 'N/A'}.` 
+            : `❌ Only ${totalVarieties} qualifying varieties (need 3). SF: ${sfVarieties.length}, AI: ${aiVarietiesForCat.length}. AI found: ${aiItemNames || 'none'}.`
         };
       };
 
@@ -540,6 +545,12 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
           },
           food_inventory: updatedInventory,
           scanned_photos: inventoryPhotos.map(p => p.Base64),
+          ai_raw_response: {
+            inventory: aiInventory,
+            evidence_found: aiEvidence,
+            critical_findings: criticalFindings,
+            photos_analyzed: inventoryPhotos.length
+          },
           sketch_validation: {
             ...validationLog.results.sketch_validation,
             sop_compliant: isSketchPass,

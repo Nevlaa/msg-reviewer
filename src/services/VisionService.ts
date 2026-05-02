@@ -71,34 +71,43 @@ export class VisionService {
    * Batch 2: High-Variety Accumulator
    */
   async analyzeInventory(imageParts: any[], expectedCategories: any[]): Promise<any> {
-    const prompt = `You are a SENIOR LEVEL 3 QC AUDITOR. Perform a thorough 3x3 VARIETY COUNT audit.
+    const prompt = `You are a SENIOR LEVEL 3 QC AUDITOR performing a USDA SNAP 3x3 VARIETY COUNT audit.
+
+    STEP 1: INVENTORY & UNIT COUNTING (CRITICAL)
+    - Survey list to verify: ${expectedCategories.join(", ")}.
+    - For EVERY distinct food variety visible, count units on shelves.
+    - If stacked or in rows, assume depth — use "10+" if more than 10.
+    - DISTINCT VARIETY RULE: Whole Milk vs 2% Milk = 2 varieties. White Bread vs Wheat Bread = 2 varieties.
+    - Slim Jim, Jack Link's, beef sticks = JERKY = counts as Meat/Poultry/Fish variety.
+    - SPAM, canned chicken, Vienna sausages, canned tuna = Meat/Poultry/Fish variety.
+    - Crackers (Ritz, Saltines), cookies, donuts, pastries, Little Debbie = Bread/Cereals variety.
+    - For EACH item set "category" to one of: "Bread/Cereals", "Dairy", "Meat/Poultry/Fish", "Fruit/Veg".
+    - Set ffr_found=true if item is inside a cooler, fridge, or freezer.
     
-    STEP 1: INVENTORY & UNIT COUNTING (VERY IMPORTANT)
-    - Specifically look for these varieties: ${expectedCategories.join(", ")}.
-    - For EVERY variety found, count the EXACT number of units visible on shelves.
-    - If you see a row or stack, assume depth. If more than 10 are visible/likely, use "10+".
-    - Match found items against the survey list.
-    - DISTINCT VARIETY RULE: Whole Milk and 2% Milk are DIFFERENT varieties. White Bread and Wheat Bread are DIFFERENT varieties.
-    - VERIFY 'FFR' (Fresh/Frozen/Refrigerated) status.
-    
-    STEP 2: STAPLE AREA EVIDENCE
-    - Scan specifically for: Jerky, Canned Foods, Chips, Milk, Eggs, Juice, Coolers, Pastry/Bread.
-    
-    Return a STRICT JSON object:
+    STEP 2: STAPLE AREA EVIDENCE (scan ALL photos)
+    - "jerky": Slim Jim, Jack Link's, beef jerky, meat sticks on any shelf or rack
+    - "canned": Any canned food shelves (soup, beans, tuna, SPAM, Vienna sausages)
+    - "chips": Chips, Doritos, Lays, Cheetos, Bugles, Combos, Chex Mix, snack bags
+    - "milk_eggs": Milk jugs, egg cartons, cheese, yogurt in coolers or fridges
+    - "juice": Juice bottles, juice boxes, Gatorade, lemonade
+    - "coolers": ANY glass-door refrigerator, walk-in cooler, fridge, freezer door — beer coolers count too
+    - "pastry": Bread loaves, buns, donuts, Little Debbie, muffins, pastries, cakes
+
+    Return STRICT JSON:
     {
       "inventory": [
-        { "item": "Variety Name", "count": "number or 10+", "ffr_found": boolean, "source_photo": "index of photo", "confidence": 0.0-1.0 }
+        { "item": "Variety Name", "category": "Category", "count": "number or 10+", "ffr_found": boolean, "source_photo": 0, "confidence": 0.9 }
       ],
       "evidence_found": {
-        "jerky": { "found": boolean, "source_photo": "index" },
-        "canned": { "found": boolean, "source_photo": "index" },
-        "chips": { "found": boolean, "source_photo": "index" },
-        "milk_eggs": { "found": boolean, "source_photo": "index" },
-        "juice": { "found": boolean, "source_photo": "index" },
-        "coolers": { "found": boolean, "source_photo": "index" },
-        "pastry": { "found": boolean, "source_photo": "index" }
+        "jerky": { "found": boolean, "source_photo": 0 },
+        "canned": { "found": boolean, "source_photo": 0 },
+        "chips": { "found": boolean, "source_photo": 0 },
+        "milk_eggs": { "found": boolean, "source_photo": 0 },
+        "juice": { "found": boolean, "source_photo": 0 },
+        "coolers": { "found": boolean, "source_photo": 0 },
+        "pastry": { "found": boolean, "source_photo": 0 }
       },
-      "quality_audit": { "status": "Good" | "Poor", "details": "string" }
+      "quality_audit": { "status": "Good", "details": "string" }
     }`;
 
     try {

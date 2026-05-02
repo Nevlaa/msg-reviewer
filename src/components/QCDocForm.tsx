@@ -264,6 +264,44 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate, isAiRunnin
           </div>
         </div>
       )}
+
+      {/* RAW AI RESPONSE JSON PANEL */}
+      {data?.results?.ai_raw_response && (
+        <details className="qc-box mt-15" style={{ background: '#0f172a', border: '1px solid #334155' }}>
+          <summary style={{ cursor: 'pointer', color: '#94a3b8', fontWeight: 'bold', padding: '0.75rem', fontSize: '0.85rem' }}>
+            🔍 RAW AI RESPONSE JSON ({data.results.ai_raw_response.photos_analyzed} photos analyzed, {data.results.ai_raw_response.inventory?.length || 0} items found)
+          </summary>
+          <div style={{ padding: '0 0.75rem 0.75rem' }}>
+            <div style={{ fontSize: '0.7rem', color: '#64748b', marginBottom: '0.5rem' }}>Evidence Detection:</div>
+            <pre style={{ 
+              background: '#1e293b', 
+              color: '#e2e8f0', 
+              padding: '1rem', 
+              borderRadius: '6px', 
+              fontSize: '0.75rem', 
+              overflow: 'auto', 
+              maxHeight: '200px',
+              border: '1px solid #334155',
+              marginBottom: '0.75rem'
+            }}>
+              {JSON.stringify(data.results.ai_raw_response.evidence_found, null, 2)}
+            </pre>
+            <div style={{ fontSize: '0.7rem', color: '#64748b', marginBottom: '0.5rem' }}>Full AI Inventory ({data.results.ai_raw_response.inventory?.length || 0} items):</div>
+            <pre style={{ 
+              background: '#1e293b', 
+              color: '#e2e8f0', 
+              padding: '1rem', 
+              borderRadius: '6px', 
+              fontSize: '0.75rem', 
+              overflow: 'auto', 
+              maxHeight: '400px',
+              border: '1px solid #334155'
+            }}>
+              {JSON.stringify(data.results.ai_raw_response.inventory, null, 2)}
+            </pre>
+          </div>
+        </details>
+      )}
     </div>
   );
 };
