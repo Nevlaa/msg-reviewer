@@ -210,31 +210,101 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate, isAiRunnin
           </div>
 
           <div className="qc-box no-padding">
-            <div className="qc-title">STAPLE FOOD INVENTORY (AI SWEEP)</div>
+            <div className="qc-title">📋 STORE REVIEWER INVENTORY vs AI VERIFICATION</div>
+            <div style={{ fontSize: '0.65rem', color: '#64748b', padding: '4px 8px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+              Comparing store reviewer's food list against AI image analysis. ✅ = 3+ units found (3x3 compliant). FFR = Fresh/Frozen/Refrigerated.
+            </div>
             <div className="inventory-table-container">
-              <table className="inventory-table-mini">
-                <thead><tr><th>Category</th><th>Item/Variety</th><th>SF Exp</th><th>AI Found</th><th>Source</th></tr></thead>
+              <table className="inventory-table-mini" style={{ fontSize: '0.7rem' }}>
+                <thead>
+                  <tr style={{ background: '#1e293b', color: '#94a3b8' }}>
+                    <th style={{ padding: '6px', width: '80px' }}>Category</th>
+                    <th style={{ padding: '6px' }}>Reviewer Item</th>
+                    <th style={{ padding: '6px' }}>AI Matched As</th>
+                    <th style={{ padding: '6px', width: '50px', textAlign: 'center' }}>Count</th>
+                    <th style={{ padding: '6px', width: '40px', textAlign: 'center' }}>FFR</th>
+                    <th style={{ padding: '6px', width: '40px', textAlign: 'center' }}>3x3</th>
+                    <th style={{ padding: '6px', width: '100px' }}>Source Photo</th>
+                  </tr>
+                </thead>
                 <tbody>
-                  {data?.results?.food_inventory?.map((item: any, idx: number) => (
-                    <tr key={idx}>
-                      <td className="tiny-text">{item.category}</td>
-                      <td className="tiny-text"><strong>{item.item || item.name || 'Unknown'}</strong></td>
-                      <td className="center-text">{item.expected}</td>
-                      <td className={`center-text ${item.actual_found !== 'Pending AI Scan' ? 'text-blue' : ''}`}>{item.actual_found}</td>
-                      <td>
-                        {item.source_photo ? (
-                          <div className="evidence-preview-tiny" onClick={() => window.open(item.source_photo, '_blank')}>
-                             <img src={item.source_photo} alt="Source" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerHTML = 'IMG'; }} />
-                          </div>
-                        ) : '---'}
-                      </td>
-                    </tr>
-                  ))}
+                  {data?.results?.food_inventory?.map((item: any, idx: number) => {
+                    const count = parseInt(item.actual_found) || 0;
+                    const countStr = item.actual_found || '—';
+                    const hasMatch = item.match && item.ai_match_name;
+                    const meetsThreshold = count >= 3 || item.actual_found === '10+';
+                    const needsFFR = item.should_be_ffr;
+                    const ffrOk = !needsFFR || item.ai_ffr_found;
+                    const rowPass = hasMatch && meetsThreshold && ffrOk;
+                    
+                    return (
+                      <tr key={idx} style={{ 
+                        borderBottom: '1px solid #e2e8f0',
+                        background: hasMatch ? (rowPass ? '#f0fdf4' : '#fefce8') : '#fef2f2'
+                      }}>
+                        <td style={{ padding: '5px 6px', fontSize: '0.6rem', color: '#64748b' }}>{item.category}</td>
+                        <td style={{ padding: '5px 6px' }}>
+                          <strong>{item.item || 'Unknown'}</strong>
+                          {item.expected && <span style={{ color: '#94a3b8', fontSize: '0.6rem', marginLeft: '4px' }}>(exp: {item.expected})</span>}
+                        </td>
+                        <td style={{ padding: '5px 6px', color: hasMatch ? '#059669' : '#dc2626', fontStyle: hasMatch ? 'normal' : 'italic' }}>
+                          {hasMatch ? item.ai_match_name : 'Not found in images'}
+                        </td>
+                        <td style={{ padding: '5px 6px', textAlign: 'center', fontWeight: 'bold' }}>
+                          <span style={{ 
+                            color: meetsThreshold ? '#059669' : '#dc2626',
+                            background: meetsThreshold ? '#d1fae5' : '#fee2e2',
+                            padding: '1px 6px',
+                            borderRadius: '3px',
+                            fontSize: '0.7rem'
+                          }}>
+                            {countStr}
+                          </span>
+                        </td>
+                        <td style={{ padding: '5px 6px', textAlign: 'center' }}>
+                          {needsFFR ? (
+                            <span style={{ fontSize: '0.8rem' }}>{item.ai_ffr_found ? '✅' : '❌'}</span>
+                          ) : (
+                            <span style={{ color: '#94a3b8', fontSize: '0.6rem' }}>N/A</span>
+                          )}
+                        </td>
+                        <td style={{ padding: '5px 6px', textAlign: 'center', fontSize: '0.85rem' }}>
+                          {hasMatch && meetsThreshold ? '✅' : '❌'}
+                        </td>
+                        <td style={{ padding: '5px 6px' }}>
+                          {item.source_photo ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <div className="evidence-preview-tiny" onClick={() => window.open(item.source_photo, '_blank')}>
+                                <img src={item.source_photo} alt="Source" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                              </div>
+                              <span style={{ fontSize: '0.55rem', color: '#64748b', fontFamily: 'monospace' }}>{item.source_photo_title || '—'}</span>
+                            </div>
+                          ) : (
+                            <span style={{ color: '#94a3b8', fontSize: '0.6rem' }}>—</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                   {(!data?.results?.food_inventory || data.results.food_inventory.length === 0) && (
-                    <tr><td colSpan={5} className="center-text p-10">No inventory found / Scan pending</td></tr>
+                    <tr><td colSpan={7} className="center-text p-10">No inventory loaded / Run AI scan</td></tr>
                   )}
                 </tbody>
               </table>
+              {/* Summary row */}
+              {data?.results?.food_inventory?.length > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 8px', background: '#f1f5f9', fontSize: '0.65rem', color: '#475569', borderTop: '2px solid #cbd5e1' }}>
+                  <span>
+                    <strong>Matched:</strong> {data.results.food_inventory.filter((i: any) => i.match).length} / {data.results.food_inventory.length} items
+                  </span>
+                  <span>
+                    <strong>3x3 Pass:</strong> {data.results.food_inventory.filter((i: any) => i.match && (parseInt(i.actual_found) >= 3 || i.actual_found === '10+')).length} items
+                  </span>
+                  <span>
+                    <strong>FFR Issues:</strong> {data.results.food_inventory.filter((i: any) => i.should_be_ffr && !i.ai_ffr_found).length}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 

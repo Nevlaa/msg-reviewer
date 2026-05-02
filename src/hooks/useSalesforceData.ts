@@ -470,26 +470,31 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
         
         // Find match in AI findings
         const found = aiInventory.find((f: any) => {
-          const fLower = f.item.toLowerCase();
+          const fLower = (f.item || '').toLowerCase();
           return fLower.includes(itemLower) || 
                  itemLower.includes(fLower) ||
-                 (catLower.includes('bread') && (fLower.includes('bread') || fLower.includes('pastry') || fLower.includes('cake') || fLower.includes('donut'))) ||
-                 (catLower.includes('dairy') && (fLower.includes('milk') || fLower.includes('cheese') || fLower.includes('egg'))) ||
-                 (catLower.includes('meat') && (fLower.includes('meat') || fLower.includes('chicken') || fLower.includes('beef') || fLower.includes('fish'))) ||
-                 (catLower.includes('fruit') && (fLower.includes('fruit') || fLower.includes('veg') || fLower.includes('apple') || fLower.includes('banana')));
+                 (catLower.includes('bread') && (fLower.includes('bread') || fLower.includes('pastry') || fLower.includes('cake') || fLower.includes('donut') || fLower.includes('cracker') || fLower.includes('cookie'))) ||
+                 (catLower.includes('dairy') && (fLower.includes('milk') || fLower.includes('cheese') || fLower.includes('egg') || fLower.includes('yogurt') || fLower.includes('butter'))) ||
+                 (catLower.includes('meat') && (fLower.includes('meat') || fLower.includes('chicken') || fLower.includes('beef') || fLower.includes('fish') || fLower.includes('jerky') || fLower.includes('slim jim') || fLower.includes('spam') || fLower.includes('sausage') || fLower.includes('tuna'))) ||
+                 (catLower.includes('fruit') && (fLower.includes('fruit') || fLower.includes('veg') || fLower.includes('apple') || fLower.includes('banana') || fLower.includes('juice') || fLower.includes('corn') || fLower.includes('bean')));
         });
 
         if (found) {
-          const photo = inventoryPhotos[found.source_photo];
+          const photoIndex = typeof found.source_photo === 'number' ? found.source_photo : parseInt(found.source_photo);
+          const photo = inventoryPhotos[photoIndex];
           return { 
             ...item, 
             actual_found: found.count,
+            ai_match_name: found.item,
+            ai_confidence: found.confidence,
+            ai_ffr_found: found.ffr_found,
             match: true,
             should_be_ffr: item.should_be_ffr || found.ffr_found,
-            source_photo: photo?.Base64 
+            source_photo: photo?.Base64,
+            source_photo_title: photo?.Title || `Photo ${photoIndex}`
           };
         }
-        return item;
+        return { ...item, ai_match_name: null, ai_ffr_found: false, source_photo_title: null };
       });
 
       const hasFFRIssues = updatedInventory.some(item => item.should_be_ffr && !item.ffr);
