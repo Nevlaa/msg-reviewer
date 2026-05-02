@@ -123,35 +123,9 @@ export const SalesforceConnector: React.FC = () => {
         </div>
       )}
 
-      {/* PERSISTENT WORKSTATION FORM */}
-      <QCDocForm 
-        data={validationLog} 
-        isAiRunning={isAiRunning}
-        onUpdate={handleUpdate}
-      />
-
+      {/* AI QC GATEKEEPER — right below fetch for quick access */}
       {validationLog && (
-        <LocationVerificationPanel data={validationLog} />
-      )}
-
-      {validationLog && (
-        <QCScoringPanel 
-          data={validationLog}
-          onUpdate={(field, value) => {
-            setValidationLog({
-              ...validationLog,
-              suggested_qc_scores: {
-                ...validationLog.suggested_qc_scores,
-                [field]: value
-              }
-            });
-          }}
-        />
-      )}
-
-      {validationLog && (
-        <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          {/* AI Action Panel */}
+        <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div className="card panel animate-fade-in" style={{ border: '2px solid var(--btn-primary)', background: 'rgba(37, 99, 235, 0.05)', position: 'relative' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div style={{ flex: 1 }}>
@@ -208,7 +182,38 @@ export const SalesforceConnector: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+      )}
 
+      {/* PERSISTENT WORKSTATION FORM */}
+      <QCDocForm 
+        data={validationLog} 
+        isAiRunning={isAiRunning}
+        onUpdate={handleUpdate}
+      />
+
+      {validationLog && (
+        <LocationVerificationPanel data={validationLog} />
+      )}
+
+      {validationLog && (
+        <QCScoringPanel 
+          data={validationLog}
+          onUpdate={(field, value) => {
+            setValidationLog({
+              ...validationLog,
+              suggested_qc_scores: {
+                ...validationLog.suggested_qc_scores,
+                [field]: value
+              }
+            });
+          }}
+        />
+      )}
+
+      {/* Final Audit Narrative */}
+      {validationLog && (
+        <div style={{ marginTop: '2rem' }}>
           <div className="card" style={{ background: 'var(--bg-secondary)', borderLeft: '4px solid var(--btn-primary)' }}>
             <h3>Final Audit Narrative</h3>
             <div className="narrative-content" style={{ whiteSpace: 'pre-wrap', fontStyle: 'italic', color: 'var(--text-secondary)' }}>

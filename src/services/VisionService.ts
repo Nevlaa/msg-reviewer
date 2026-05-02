@@ -115,18 +115,52 @@ export class VisionService {
       const response = await result.response;
       let text = response.text().trim();
 
-      // JSON REPAIR: If truncated, try to close the array/object
-      if (!text.endsWith('}')) {
-        console.warn("AI: JSON truncated. Attempting repair...");
-        if (text.includes('"inventory": [')) {
-          text = text.replace(/,?\s*$/, '') + ']}';
-        } else {
-          text = text + '}';
-        }
-      }
+      // Extract JSON block
+      let cleanJson = text.match(/\{[\s\S]*\}/)?.[0] || text;
 
-      const cleanJson = text.match(/\{[\s\S]*\}/)?.[0] || text;
-      return JSON.parse(cleanJson);
+      // Robust JSON repair for truncated Gemini responses
+      const repairJson = (raw: string): any => {
+        // Attempt 1: parse as-is
+        try { return JSON.parse(raw); } catch (_) {}
+        
+        // Attempt 2: close unterminated strings and brackets
+        let fixed = raw;
+        // Close any unterminated string (odd number of unescaped quotes)
+        const quoteCount = (fixed.match(/(?<!\\)"/g) || []).length;
+        if (quoteCount % 2 !== 0) {
+          fixed = fixed.replace(/,?\s*$/, '') + '"';
+        }
+        // Remove trailing commas before closing brackets
+        fixed = fixed.replace(/,\s*$/, '');
+        // Count open vs close brackets and close any remaining
+        const openBrackets = (fixed.match(/\[/g) || []).length;
+        const closeBrackets = (fixed.match(/\]/g) || []).length;
+        const openBraces = (fixed.match(/\{/g) || []).length;
+        const closeBraces = (fixed.match(/\}/g) || []).length;
+        for (let i = 0; i < openBrackets - closeBrackets; i++) fixed += ']';
+        for (let i = 0; i < openBraces - closeBraces; i++) fixed += '}';
+        
+        try { return JSON.parse(fixed); } catch (_) {}
+        
+        // Attempt 3: truncate to the last complete inventory item
+        const lastGoodItem = fixed.lastIndexOf('},');
+        if (lastGoodItem > 0) {
+          const truncated = fixed.substring(0, lastGoodItem + 1);
+          // Re-close everything
+          let reclose = truncated;
+          const ob = (reclose.match(/\[/g) || []).length - (reclose.match(/\]/g) || []).length;
+          const oc = (reclose.match(/\{/g) || []).length - (reclose.match(/\}/g) || []).length;
+          for (let i = 0; i < ob; i++) reclose += ']';
+          for (let i = 0; i < oc; i++) reclose += '}';
+          try { return JSON.parse(reclose); } catch (_) {}
+        }
+        
+        console.error("AI: All JSON repair attempts failed. Returning partial data.");
+        return { inventory: [], evidence_found: {}, quality_audit: { status: "Error", details: "JSON parse failed" } };
+      };
+
+      console.log(`AI: Raw inventory response length: ${cleanJson.length} chars`);
+      return repairJson(cleanJson);
     } catch (err) {
       console.error("Gemini Inventory Analysis Failed:", err);
       throw err;
