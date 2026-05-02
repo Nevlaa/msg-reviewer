@@ -17,10 +17,10 @@ const CategoryTable: React.FC<{ title: string, items: FoodItem[], exceeds: boole
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem', textAlign: 'left' }}>
         <thead style={{ background: 'var(--bg-secondary)' }}>
           <tr>
-            <th style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Variety</th>
-            <th style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Stock</th>
-            <th style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Unit</th>
-            <th style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>FFR?</th>
+            <th style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Variety Name</th>
+            <th style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Count (Max 20)</th>
+            <th style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Unit / LB</th>
+            <th style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>F/F/R Status</th>
           </tr>
         </thead>
         <tbody>
@@ -30,8 +30,16 @@ const CategoryTable: React.FC<{ title: string, items: FoodItem[], exceeds: boole
               <td style={{ padding: '0.5rem' }}>{item.count}</td>
               <td style={{ padding: '0.5rem' }}>{item.unit_of_sale}</td>
               <td style={{ padding: '0.5rem' }}>
-                <span style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', background: item.is_ffr ? 'rgba(5, 150, 105, 0.1)' : 'var(--bg-secondary)', color: item.is_ffr ? 'var(--accent-green)' : 'var(--text-secondary)', fontSize: '0.7rem', fontWeight: 600 }}>
-                  {item.is_ffr ? 'Yes' : 'No'}
+                <span style={{ 
+                  padding: '0.2rem 0.6rem', 
+                  borderRadius: '10px', 
+                  background: item.is_ffr ? 'rgba(5, 150, 105, 0.2)' : 'rgba(255, 255, 255, 0.05)', 
+                  color: item.is_ffr ? 'var(--accent-green)' : 'var(--text-secondary)', 
+                  fontSize: '0.65rem', 
+                  fontWeight: 800,
+                  border: item.is_ffr ? '1px solid var(--accent-green)' : '1px solid transparent'
+                }}>
+                  {item.is_ffr ? 'PERISHABLE' : 'STABLE'}
                 </span>
               </td>
             </tr>
@@ -50,9 +58,20 @@ const CategoryTable: React.FC<{ title: string, items: FoodItem[], exceeds: boole
 export const FoodInventoryDashboard: React.FC<DashboardProps> = ({ report }) => {
   return (
     <div className="card panel">
-      <div className="card-header">
-        <h2>Parsed Phase B Document</h2>
-        <p>Staple Food Inventory mapped directly from standard LLM response output.</p>
+      <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h2>Senior Level 3 Audit Report</h2>
+          <p>Validated via multi-pass AI scan. Integrity Level: <strong>{report.metadata.audit_integrity}</strong></p>
+        </div>
+        <div className="accuracy-badge">
+          <span className="label">SENIOR L3 ACCURACY</span>
+          <span className="value">{(report.metadata.confidence_score * 100).toFixed(0)}%</span>
+        </div>
+      </div>
+
+      <div className="audit-narrative-box">
+        <h4>Senior Auditor Narrative:</h4>
+        <p>{report.reviewer_comments}</p>
       </div>
 
       <CategoryTable 

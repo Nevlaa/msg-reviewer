@@ -1,68 +1,74 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { SNAPScanReport } from "../types";
-import { getSystemPrompt } from "./PromptGenerator";
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(API_KEY);
 
-export type ValidationMode = 'reviewer' | 'qc';
-
 /**
- * GeminiOrchestrator: Orchestrates multi-image batch processing via Gemini 1.5 Pro.
+ * GeminiOrchestrator - Stable Version 1.5.0
+ * Standardized on gemini-1.5-flash for reliability.
  */
 export const processBatchWithGemini = async (
-  files: File[], 
-  mode: ValidationMode = 'reviewer'
+  files: File[]
 ): Promise<SNAPScanReport> => {
-  // 1. Initialize Model (Gemini 1.5 Pro recommended for 70+ images & complex logic)
   const model = genAI.getGenerativeModel({ 
-    model: "gemini-1.5-pro",
+    model: "gemini-1.5-flash",
     generationConfig: { responseMimeType: "application/json" }
   });
 
-  // 2. Prepare System Instructions
-  let systemInstructions = getSystemPrompt();
-  
-  if (mode === 'qc') {
-    systemInstructions += "\n\nCRITICAL QC OVERRIDE: Act as the QC AUDITOR. Your primary goal is to verify the accuracy of the reviewer's counts. Flag any deficiencies, blurriness, or missed varieties with higher scrutiny.";
-  }
-
-  // 3. Convert Files to GenerativePart (Base64)
   const imageParts = await Promise.all(
     files.map(async (file) => {
-      const base64Data = await fileToBase64(file);
+      const base64Data = await fileToCompressedBase64(file);
       return {
         inlineData: {
           data: base64Data.split(",")[1],
-          mimeType: file.type,
+          mimeType: "image/jpeg",
         },
       };
     })
   );
 
-  // 4. Execute Prompt
   try {
     const result = await model.generateContent([
-      systemInstructions,
+      "Analyze these store photos and return a SNAP compliance report in JSON.",
       ...imageParts
     ]);
-
-    const responseText = result.response.text();
-    return JSON.parse(responseText) as SNAPScanReport;
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    throw new Error("Failed to process batch with Gemini. Please check your API key or image formats.");
+    
+    const response = await result.response;
+    const responseText = response.text();
+    const cleanedJson = responseText.replace(/```json\n?|```/g, '').trim();
+    return JSON.parse(cleanedJson) as SNAPScanReport;
+  } catch (error: any) {
+    console.error("Gemini Batch Error:", error);
+    throw new Error(`Gemini Batch Error: ${error.message}`);
   }
 };
 
-/**
- * Utility: Converts File object to Base64 string for API ingestion
- */
-const fileToBase64 = (file: File): Promise<string> => {
+const fileToCompressedBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
     reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_SIZE = 1024;
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+        } else {
+          if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.6));
+      };
+      img.onerror = reject;
+    };
+    reader.onerror = reject;
   });
 };

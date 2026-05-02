@@ -1,0 +1,19 @@
+{
+  "survey_object": {
+    "api_name": "Survey__c",
+    "fields": {
+      "fns_number": "Store_Visit__c",
+      "consent_link": "Consent_Form_Link__c",
+      "sketch_link": "Sketch_Link__c"
+    }
+  },
+  "inventory_object": {
+    "api_name": "Food_Inventory__c",
+    "fields": {
+      "bread_count": "Count_BreadCereals_Variety_1__c",
+      "dairy_count": "Count_Dairy_Variety_1__c",
+      "fv_count": "Count_FV_Variety_1__c",
+      "mpf_count": "Count_MPF_Variety_1__c"
+    }
+  }
+}

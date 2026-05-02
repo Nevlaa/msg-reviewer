@@ -1,0 +1,105 @@
+{
+  "survey_object": {
+    "api_name": "Survey__c",
+    "fields": {
+      "fns_number": "Store_Visit__r.Name",
+      "survey_number": "Name",
+      "store_name": "Store_Name__c",
+      "usda_owner_name": "Owner_Manager_Name__c",
+      "survey_owner_name": "Store_Owner_Names__c",
+      "usda_address": "Street_Address_1__c",
+      "survey_address": "Street_Address_1__c",
+      "store_comments": "Store_Visit_Comments__c",
+      "consent_record_type": "RecordTypeId",
+      "consent_link": "Consent_Form_Link__c",
+      "sketch_link": "Sketch_Link__c",
+      "store_location_link": "Store_Location__c",
+      "address_different": "Store_Address_is_Different__c",
+      "registers": "of_checkout_countersareas__c",
+      "specialty_registers": "of_specialty_cash_registers__c",
+      "total_pos": "Total_POS_devices__c",
+      "pos_snap": "of_POS_devices_accepting_SNAP__c",
+      "sales_area_sf": "Est_square_footage_of_store_public_area__c",
+      "storage_area_sf": "Estimated_square_footage_of_storage_room__c",
+      "food_in_storage": "Food_stored_in_storage_areas__c",
+      "freezers": "Freezers__c",
+      "refrigerators": "Refrigerators__c",
+      "storage_freezers": "of_storage_freezers__c",
+      "signage_name": "Store_Name_as_Posted_on_Outside_Signage__c",
+      "fraud_poster": "SNAP_No_Fraud_Poster_Displayed__c",
+      "hpi": {
+        "prefix": "HPI_",
+        "descSuffix": "_Description__c",
+        "unitsSuffix": "_of_Units__c",
+        "count": 6
+      },
+      "formula": {
+        "prefix": "Infant_Formula_",
+        "descSuffix": "_Description__c",
+        "unitsSuffix": "_of_Units__c",
+        "count": 4,
+        "na": "Infant_Formula_NA__c",
+        "wic": "Store_accepts_WICWomenInfantChildren__c"
+      },
+      "collaboration": "Store_Contact_Collaborated_on_survey_Qs__c",
+      "store_visit_comments": "Store_Visit_Comments__c",
+      "visit_1_arrival": "Site_Visit1st_attempt_arrivalDateTime__c",
+      "visit_2_arrival": "Re_Visit2nd_attempt_arrival_DateTime__c",
+      "visit_outcome": "Outcome_of_store_visit__c",
+      "visit_no_site": "No_on_site_visit_made__c",
+      "visit_unsuccessful_reason": "Unsuccessful_Visit_Reason__c",
+      "visit_date": "Date_of_Visit__c",
+      "visit_contact_name": "Store_Contact_Name__c",
+      "visit_contact_title": "Store_Contact_Title__c",
+      "scoring": {
+        "quality_count": "Quality_Count__c",
+        "food_count_feedback": "Food_Count_Feedback__c",
+        "quality_photos": "Quality_Food_Photos__c",
+        "food_photos_feedback": "Food_Photos_Feedback__c",
+        "quality_docs": "Quality_Critical_Photos_Docs__c",
+        "internal_doc_feedback": "EXT_OV_CO_Consent_SK_Fdbk__c",
+        "quality_survey": "Quality_Survey__c",
+        "survey_feedback": "Survey_Feedback__c",
+        "missing_info": "Missing_Information__c",
+        "requests_to_reviewer": "QC_Requests_to_Reviewer__c",
+        "internal_qc_comments": "Internal_QC_Comments__c",
+        "other_feedback": "Feedback_Comments__c",
+        "auditor_name": "QC_d_By_2__c",
+        "missing_3x3": "Missing_3_X_3__c"
+      }
+    }
+  },
+  "inventory_object": {
+    "api_name": "Food_Inventory__c",
+    "categories": {
+      "bread": {
+        "label": "Bread/Cereals",
+        "prefix": "BreadCereals_Variety_",
+        "countPrefix": "Count_BreadCereals_Variety_",
+        "ffrPrefix": "FFR_BreadCereals_",
+        "max": 10
+      },
+      "dairy": {
+        "label": "Dairy",
+        "prefix": "Dairy_Variety_",
+        "countPrefix": "Count_Dairy_Variety_",
+        "ffrPrefix": "FFR_Dairy_",
+        "max": 10
+      },
+      "meat": {
+        "label": "Meat/Poultry/Fish",
+        "prefix": "MPF_Variety_",
+        "countPrefix": "Count_MPF_Variety_",
+        "ffrPrefix": "FFR_MPF_",
+        "max": 10
+      },
+      "produce": {
+        "label": "Fruit/Veg",
+        "prefix": "FV_Variety_",
+        "countPrefix": "Count_FV_Variety_",
+        "ffrPrefix": "FFR_FV_",
+        "max": 14
+      }
+    }
+  }
+}
