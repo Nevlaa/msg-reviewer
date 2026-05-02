@@ -397,7 +397,15 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
             reader.onerror = reject;
             reader.readAsDataURL(blob);
           });
-          const mimeType = blob.type || 'image/jpeg';
+          let mimeType = blob.type || 'image/jpeg';
+          
+          // Gemini does not support application/octet-stream. 
+          // If we got this from a binary download, force it to image/jpeg since we know these are photos.
+          if (mimeType === 'application/octet-stream' || !mimeType.startsWith('image/')) {
+            console.log(`AI: Overriding unsupported MIME type (${mimeType}) to image/jpeg`);
+            mimeType = 'image/jpeg';
+          }
+
           return {
             base64: `data:${mimeType};base64,${base64}`,
             part: { inlineData: { data: base64, mimeType } }
@@ -427,18 +435,35 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
 
       const convertToPart = async (p: any) => {
         if (!p) return null;
-        const base64 = await service.getPhotoBase64(p.VersionData);
-        // Inject Base64 directly into the photo object for UI reuse
-        p.Base64 = `data:image/${p.FileExtension === 'jpg' ? 'jpeg' : p.FileExtension};base64,${base64}`;
-        return { inlineData: { data: base64, mimeType: `image/${p.FileExtension === 'jpg' ? 'jpeg' : p.FileExtension}` } };
+        
+        // Whitelist supported extensions for Gemini
+        const ext = (p.FileExtension || '').toLowerCase();
+        const isSupported = ['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif'].includes(ext);
+        
+        if (!isSupported) {
+          console.warn(`AI: Skipping unsupported file format (${ext}): ${p.Title}`);
+          return null;
+        }
+
+        try {
+          const base64 = await service.getPhotoBase64(p.VersionData);
+          const mimeType = `image/${ext === 'jpg' ? 'jpeg' : ext}`;
+          
+          // Inject Base64 directly into the photo object for UI reuse
+          p.Base64 = `data:${mimeType};base64,${base64}`;
+          return { inlineData: { data: base64, mimeType } };
+        } catch (err) {
+          console.error(`AI: Failed to convert photo to part: ${p.Title}`, err);
+          return null;
+        }
       };
 
       const criticalParts = {
         consent: consentFromLink?.part || await convertToPart(criticalPhotos.consent),
         sketch: sketchFromLink?.part || await convertToPart(criticalPhotos.sketch),
         exterior: await convertToPart(criticalPhotos.exterior),
-        overviews: await Promise.all(criticalPhotos.overviews.map(convertToPart)),
-        checkouts: await Promise.all(criticalPhotos.checkouts.map(convertToPart))
+        overviews: (await Promise.all(criticalPhotos.overviews.map(convertToPart))).filter(Boolean),
+        checkouts: (await Promise.all(criticalPhotos.checkouts.map(convertToPart))).filter(Boolean)
       };
 
       const expectedFns = getVal(survey, mapping.survey_object.fields.fns_number);
