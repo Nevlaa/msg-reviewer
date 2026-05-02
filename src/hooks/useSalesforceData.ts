@@ -580,7 +580,7 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
         // Count AI-discovered varieties
         const catAliases: Record<string, string[]> = {
           'Bread/Cereals': ['bread', 'cereal', 'pastry', 'cake', 'donut', 'muffin', 'cracker', 'cookie', 'granola', 'oatmeal', 'tortilla', 'roll', 'ritz', 'saltine', 'little debbie', 'pasta', 'ramen', 'rice'],
-          'Dairy': ['milk', 'cheese', 'yogurt', 'butter', 'cream', 'egg', 'dairy', 'margarine', 'soy milk', 'almond milk', 'oat milk', 'formula'],
+          'Dairy': ['milk', 'cheese', 'yogurt', 'butter', 'cream', 'egg', 'dairy', 'margarine', 'soy milk', 'almond milk', 'oat milk', 'formula', 'shake', 'fairlife', 'core power', 'muscle milk', 'nesquik'],
           'Meat/Poultry/Fish': ['meat', 'chicken', 'beef', 'pork', 'fish', 'turkey', 'sausage', 'ham', 'spam', 'tuna', 'salmon', 'jerky', 'slim jim', 'jack link', 'vienna', 'hot dog', 'bacon', 'egg'],
           'Fruit/Veg': ['fruit', 'vegetable', 'apple', 'banana', 'orange', 'tomato', 'lettuce', 'potato', 'carrot', 'onion', 'grape', 'corn', 'bean', 'pea', 'juice', 'berry', 'melon']
         };

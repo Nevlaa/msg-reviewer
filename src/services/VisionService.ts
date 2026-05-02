@@ -74,28 +74,30 @@ export class VisionService {
     const prompt = `You are a SENIOR LEVEL 3 QC AUDITOR performing a USDA SNAP 3x3 or 10/10/10/14 VARIETY COUNT audit.
     
     CRITICAL TAXONOMY RULES:
-    - CATEGORIZATION: Use the "First Ingredient Rule" for mixed foods (e.g., Chicken Noodle Soup = Meat, Tomato Soup = Vegetable).
+    - CATEGORIZATION: Use the "First Ingredient Rule" for mixed foods.
+    - DAIRY VARIETIES: Chocolate Milk, Strawberry Milk, and Dairy-based Protein Shakes (e.g., Core Power, Fairlife) COUNT as distinct varieties.
     - EXCLUSIONS: Do NOT count Accessory Foods (Chips, Candy, Soda) or Hot Prepared Foods.
     - PRIORITY: Prioritize FFR (Fresh, Frozen, Refrigerated) items first.
     
-    CATEGORIES (Use these ONLY):
-    1. "Bread/Cereals": Rice, Quinoa, Oats, Bagels, Loaf Bread, Tortillas, Cereals, Pasta, Ramen. (Inc. Crackers, Pastries).
-    2. "Dairy": Milk, Cheese, Yogurt, Butter, Ghee. (Inc. Almond/Soy/Oat alternatives, Infant Formula).
-    3. "Meat/Poultry/Fish": Beef, Chicken, Pork, Turkey, Salmon, Tuna, Shrimp, Eggs. (Inc. Jerky, SPAM, Canned Meats).
-    4. "Fruit/Veg": Apples, Bananas, Oranges, Tomatoes, Potatoes, Onions, Peppers, 100% Juice. (Inc. Canned/Frozen).
+    CATEGORIES:
+    1. "Bread/Cereals": Rice, Oats, Bread, Tortillas, Cereals, Pasta, Ramen.
+    2. "Dairy": Milk (Whole, 2%, Skim), Flavored Milk (Chocolate), Protein Shakes (Dairy-based), Yogurt, Cheese, Butter.
+    3. "Meat/Poultry/Fish": Beef, Chicken, Pork, Salmon, Tuna, Eggs, Jerky, SPAM.
+    4. "Fruit/Veg": Apples, Bananas, Tomatoes, Potatoes, 100% Juice, Canned Veg.
 
     STEP 1: INVENTORY & UNIT COUNTING (CRITICAL)
     - Survey list to verify: ${expectedCategories.join(", ")}.
-    - For EVERY distinct variety, count units.
-    - VOLUME CAP: Use "20+" for any variety with 20 or more units. NEVER return a count higher than 20.
-    - DISTINCT VARIETY RULE: Whole Milk vs 2% Milk = 2 varieties. White Bread vs Wheat Bread = 2 varieties.
-    - Set ffr_found=true if item is inside a cooler, fridge, or freezer.
+    - For EVERY distinct variety, count units. 
+    - DISTINCT VARIETY RULE: Whole Milk, 2% Milk, and Chocolate Milk are 3 DIFFERENT varieties. Fairlife Chocolate vs Core Power Vanilla are DIFFERENT varieties.
+    - DEPTH ASSUMPTION: If items are in rows or stacked, assume depth. Use "10+" or "20+" if the row/stack looks deep.
+    - VOLUME CAP: Use "20+" for 20+ units.
+    - Set ffr_found=true if item is inside a cooler or freezer.
     
-    STEP 2: STAPLE AREA EVIDENCE (scan ALL photos)
+    STEP 2: STAPLE AREA EVIDENCE
     - "jerky": Jerky/Meat sticks
     - "canned": Canned meat/veg/soup
-    - "chips": ACCESSORY snack bags (for context only)
-    - "milk_eggs": Dairy/Eggs in coolers
+    - "chips": ACCESSORY snack bags
+    - "milk_eggs": Dairy/Eggs/Shakes in coolers
     - "juice": 100% Juice bottles
     - "coolers": Any glass-door fridge/freezer
     - "pastry": Bread/Pastries/Baked goods
