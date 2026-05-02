@@ -520,37 +520,46 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
 
       // 10. Re-Evaluate 3x3 Rules based on AI Counts
       const check3x3Status = (category: string) => {
-        // Count varieties from the updated SF inventory
+        // Find varieties from the updated SF inventory that meet the 3+ unit threshold
         const sfVarieties = updatedInventory.filter(i => 
-          i.category === category && i.actual_found !== "Pending AI Scan" && (parseInt(i.actual_found) >= 3 || i.actual_found === '10+')
+          i.category === category && 
+          i.actual_found !== "Pending AI Scan" && 
+          (parseInt(i.actual_found) >= 3 || i.actual_found === '10+' || i.actual_found === '20+')
         );
 
-        // Also count AI-discovered varieties by direct category match OR keyword alias
+        // Determine if this is a Large Store audit based on mapping max or actual SF input
+        const isProduce = category === 'Fruit/Veg';
+        const largeStoreThreshold = isProduce ? 14 : 10;
+        
+        // If the reviewer entered more than 3 varieties, assume large store rules apply
+        const sfTotalEntered = updatedInventory.filter(i => i.category === category).length;
+        const requiredVarieties = sfTotalEntered > 3 ? largeStoreThreshold : 3;
+
+        // Count AI-discovered varieties
         const catAliases: Record<string, string[]> = {
-          'Bread/Cereals': ['bread', 'cereal', 'pastry', 'cake', 'donut', 'muffin', 'cracker', 'cookie', 'granola', 'oatmeal', 'tortilla', 'roll', 'ritz', 'saltine', 'little debbie'],
-          'Dairy': ['milk', 'cheese', 'yogurt', 'butter', 'cream', 'egg', 'dairy', 'margarine'],
-          'Meat/Poultry/Fish': ['meat', 'chicken', 'beef', 'pork', 'fish', 'turkey', 'sausage', 'ham', 'spam', 'tuna', 'salmon', 'jerky', 'slim jim', 'jack link', 'vienna', 'hot dog', 'bologna', 'pepperoni'],
-          'Fruit/Veg': ['fruit', 'vegetable', 'apple', 'banana', 'orange', 'tomato', 'lettuce', 'potato', 'carrot', 'onion', 'grape', 'corn', 'bean', 'pea']
+          'Bread/Cereals': ['bread', 'cereal', 'pastry', 'cake', 'donut', 'muffin', 'cracker', 'cookie', 'granola', 'oatmeal', 'tortilla', 'roll', 'ritz', 'saltine', 'little debbie', 'pasta', 'ramen', 'rice'],
+          'Dairy': ['milk', 'cheese', 'yogurt', 'butter', 'cream', 'egg', 'dairy', 'margarine', 'soy milk', 'almond milk', 'oat milk', 'formula'],
+          'Meat/Poultry/Fish': ['meat', 'chicken', 'beef', 'pork', 'fish', 'turkey', 'sausage', 'ham', 'spam', 'tuna', 'salmon', 'jerky', 'slim jim', 'jack link', 'vienna', 'hot dog', 'bacon', 'egg'],
+          'Fruit/Veg': ['fruit', 'vegetable', 'apple', 'banana', 'orange', 'tomato', 'lettuce', 'potato', 'carrot', 'onion', 'grape', 'corn', 'bean', 'pea', 'juice', 'berry', 'melon']
         };
         const aliases = catAliases[category] || [];
         
         const aiVarietiesForCat = aiInventory.filter((f: any) => {
-          // Match by explicit AI category OR by keyword alias
           if (f.category && f.category === category) return true;
           const fLower = (f.item || '').toLowerCase();
           return aliases.some(alias => fLower.includes(alias));
         });
 
-        // Combine: take the higher of SF-matched or AI-discovered
+        // The audit passes if the AI confirms at least the required number of varieties
         const totalVarieties = Math.max(sfVarieties.length, aiVarietiesForCat.length);
-        const passed = totalVarieties >= 3;
+        const passed = totalVarieties >= requiredVarieties;
 
         const aiItemNames = aiVarietiesForCat.map((f: any) => f.item).slice(0, 5).join(', ');
         return {
           status: passed,
           reasoning: passed 
-            ? `✅ ${totalVarieties} varieties confirmed (SF: ${sfVarieties.length}, AI: ${aiVarietiesForCat.length}). AI found: ${aiItemNames || 'N/A'}.` 
-            : `❌ Only ${totalVarieties} qualifying varieties (need 3). SF: ${sfVarieties.length}, AI: ${aiVarietiesForCat.length}. AI found: ${aiItemNames || 'none'}.`
+            ? `✅ ${totalVarieties} varieties confirmed (Req: ${requiredVarieties}). AI found: ${aiItemNames || 'N/A'}.` 
+            : `❌ Only ${totalVarieties} varieties found (Req: ${requiredVarieties}). SF items: ${sfVarieties.length}, AI items: ${aiVarietiesForCat.length}.`
         };
       };
 
