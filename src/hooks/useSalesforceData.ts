@@ -350,13 +350,23 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
       setAiStatus('Phase 2: Auditing Critical Evidence (Consent, Sketch, Layout)...');
       setAiProgress(45);
       console.log("AI: Processing Batch 1 (Critical Evidence)...");
-      const criticalPhotos = {
-        consent: photos.find(p => p.Title.toLowerCase().includes('consent')),
-        sketch: photos.find(p => p.Title.toLowerCase().includes('sketch')),
-        exterior: photos.find(p => p.Title.toLowerCase().includes('exterior')),
-        overviews: photos.filter(p => p.Title.toLowerCase().includes('overview')).slice(0, 3),
-        checkouts: photos.filter(p => p.Title.toLowerCase().includes('checkout') || p.Title.toLowerCase().includes('register')).slice(0, 3)
+
+      // Helper: check Title, Description, and Tags for a keyword
+      const photoHasTag = (p: any, keyword: string) => {
+        const searchable = `${p.Title || ''} ${p.Description || ''} ${p.TagCsv || ''}`.toLowerCase();
+        return searchable.includes(keyword);
       };
+
+      const criticalPhotos = {
+        consent: photos.find(p => photoHasTag(p, 'consent')),
+        sketch: photos.find(p => photoHasTag(p, 'sketch')),
+        exterior: photos.find(p => photoHasTag(p, 'exterior')),
+        overviews: photos.filter(p => photoHasTag(p, 'overview')).slice(0, 3),
+        checkouts: photos.filter(p => photoHasTag(p, 'checkout') || photoHasTag(p, 'register')).slice(0, 3)
+      };
+
+      const criticalCount = [criticalPhotos.consent, criticalPhotos.sketch, criticalPhotos.exterior].filter(Boolean).length;
+      console.log(`AI: Critical photos found by metadata: ${criticalCount}/3 (consent: ${!!criticalPhotos.consent}, sketch: ${!!criticalPhotos.sketch}, exterior: ${!!criticalPhotos.exterior})`);
 
       const convertToPart = async (p: any) => {
         if (!p) return null;
@@ -390,13 +400,12 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
       setAiStatus('Phase 3: Scanning Food Inventory for variety counts...');
       setAiProgress(70);
       console.log("AI: Processing Batch 2 (Food Inventory)...");
-      // Send ALL photos except those already processed in Batch 1
-      const criticalTitles = ['consent', 'sketch', 'exterior'];
+      // Send ALL photos except those identified as critical documents in Batch 1
+      const criticalKeywords = ['consent', 'sketch', 'exterior'];
       const inventoryPhotos = photos.filter(p => {
-        const titleLower = p.Title.toLowerCase();
-        return !criticalTitles.some(ct => titleLower.includes(ct));
+        return !criticalKeywords.some(kw => photoHasTag(p, kw));
       }).slice(0, 50);
-      console.log(`AI: Sending ${inventoryPhotos.length} inventory/area photos to vision engine.`);
+      console.log(`AI: Sending ${inventoryPhotos.length} of ${photos.length} photos to inventory sweep (excluded ${photos.length - inventoryPhotos.length} critical).`);
 
       const inventoryParts = await Promise.all(inventoryPhotos.map(convertToPart));
       const expectedList = validationLog.results.food_inventory.map(i => i.item);
