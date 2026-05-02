@@ -506,20 +506,63 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
       const aiEvidence = inventoryFindings.evidence_found || {};
       const aiLayout = criticalFindings?.layout || {};
 
+      const usedAiIndices = new Set<number>();
       const updatedInventory = validationLog.results.food_inventory.map(item => {
         const itemLower = item.item.toLowerCase();
         const catLower = item.category.toLowerCase();
         
-        // Find match in AI findings
-        const found = aiInventory.find((f: any) => {
+        // Find match in AI findings that hasn't been used yet
+        // 1. Try Specific Name Match first
+        let matchIdx = aiInventory.findIndex((f: any, idx: number) => {
+          if (usedAiIndices.has(idx)) return false;
           const fLower = (f.item || '').toLowerCase();
-          return fLower.includes(itemLower) || 
-                 itemLower.includes(fLower) ||
-                 (catLower.includes('bread') && (fLower.includes('bread') || fLower.includes('pastry') || fLower.includes('cake') || fLower.includes('donut') || fLower.includes('cracker') || fLower.includes('cookie') || fLower.includes('rice') || fLower.includes('oat') || fLower.includes('flour') || fLower.includes('pasta') || fLower.includes('ramen') || fLower.includes('noodle') || fLower.includes('tortilla') || fLower.includes('bagel') || fLower.includes('pita') || fLower.includes('naan'))) ||
-                 (catLower.includes('dairy') && (fLower.includes('milk') || fLower.includes('cheese') || fLower.includes('egg') || fLower.includes('yogurt') || fLower.includes('butter') || fLower.includes('margarine') || fLower.includes('soy') || fLower.includes('almond') || fLower.includes('oat') || fLower.includes('coconut') || fLower.includes('cashew') || fLower.includes('formula') || fLower.includes('ghee') || fLower.includes('sour cream'))) ||
-                 (catLower.includes('meat') && (fLower.includes('meat') || fLower.includes('chicken') || fLower.includes('beef') || fLower.includes('fish') || fLower.includes('jerky') || fLower.includes('slim jim') || fLower.includes('spam') || fLower.includes('sausage') || fLower.includes('tuna') || fLower.includes('pork') || fLower.includes('turkey') || fLower.includes('salmon') || fLower.includes('shrimp') || fLower.includes('crab') || fLower.includes('tilapia') || fLower.includes('egg') || fLower.includes('bacon') || fLower.includes('ham') || fLower.includes('steak'))) ||
-                 (catLower.includes('fruit') && (fLower.includes('fruit') || fLower.includes('veg') || fLower.includes('apple') || fLower.includes('banana') || fLower.includes('juice') || fLower.includes('corn') || fLower.includes('bean') || fLower.includes('potato') || fLower.includes('tomato') || fLower.includes('onion') || fLower.includes('pepper') || fLower.includes('broccoli') || fLower.includes('carrot') || fLower.includes('lettuce') || fLower.includes('berry') || fLower.includes('melon') || fLower.includes('orange') || fLower.includes('pea') || fLower.includes('kale') || fLower.includes('spinach')));
+          return fLower.includes(itemLower) || itemLower.includes(fLower);
         });
+
+        // 2. Try Specific Variety Match (if not found by name)
+        if (matchIdx === -1) {
+          matchIdx = aiInventory.findIndex((f: any, idx: number) => {
+            if (usedAiIndices.has(idx)) return false;
+            const fLower = (f.item || '').toLowerCase();
+            
+            // Dairy specifics
+            if (itemLower.includes('margarine') && (fLower.includes('margarine') || fLower.includes('spread'))) return true;
+            if (itemLower.includes('butter') && (fLower.includes('butter') || fLower.includes('ghee'))) return true;
+            if (itemLower.includes('bar') && (fLower.includes('bar') || fLower.includes('snack'))) return true;
+            if (itemLower.includes('formula') && fLower.includes('formula')) return true;
+            if (itemLower.includes('cheese') && fLower.includes('cheese')) return true;
+            if (itemLower.includes('yogurt') && fLower.includes('yogurt')) return true;
+            if (itemLower.includes('milk') && (fLower.includes('milk') || fLower.includes('shake') || fLower.includes('nesquik') || fLower.includes('fairlife') || fLower.includes('core power'))) return true;
+            
+            // Bread/Grain specifics
+            if (itemLower.includes('flour') && fLower.includes('flour')) return true;
+            if (itemLower.includes('rice') && fLower.includes('rice')) return true;
+            if (itemLower.includes('cereal') && (fLower.includes('cereal') || fLower.includes('oat') || fLower.includes('granola'))) return true;
+            if (itemLower.includes('pasta') && (fLower.includes('pasta') || fLower.includes('ramen') || fLower.includes('noodle'))) return true;
+            if (itemLower.includes('tortilla') && fLower.includes('tortilla')) return true;
+            
+            // Meat specifics
+            if (itemLower.includes('jerky') && (fLower.includes('jerky') || fLower.includes('slim jim'))) return true;
+            if (itemLower.includes('egg') && fLower.includes('egg')) return true;
+            if (itemLower.includes('chicken') && fLower.includes('chicken')) return true;
+            if (itemLower.includes('beef') && fLower.includes('beef')) return true;
+            if (itemLower.includes('fish') && (fLower.includes('fish') || fLower.includes('tuna') || fLower.includes('salmon'))) return true;
+            
+            return false;
+          });
+        }
+
+        // 3. Fallback to broad category match ONLY if no specific matches found
+        if (matchIdx === -1) {
+          matchIdx = aiInventory.findIndex((f: any, idx: number) => {
+            if (usedAiIndices.has(idx)) return false;
+            const fCat = (f.category || '').toLowerCase();
+            return fCat === catLower;
+          });
+        }
+
+        const found = matchIdx !== -1 ? aiInventory[matchIdx] : null;
+        if (matchIdx !== -1) usedAiIndices.add(matchIdx);
 
         if (found) {
           const photoIndex = typeof found.source_photo === 'number' ? found.source_photo : parseInt(found.source_photo);
