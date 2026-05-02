@@ -596,7 +596,23 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
               canned: aiEvidence.canned?.found,
               juice: aiEvidence.juice?.found,
               coolers: aiEvidence.coolers?.found,
-              pastry: aiEvidence.pastry?.found
+              pastry: aiEvidence.pastry?.found,
+              sources: {
+                jerky: { source_photo: inventoryPhotos[aiEvidence.jerky?.source_photo]?.Base64 },
+                chips: { source_photo: inventoryPhotos[aiEvidence.chips?.source_photo]?.Base64 },
+                milk: { source_photo: inventoryPhotos[aiEvidence.milk_eggs?.source_photo]?.Base64 },
+                canned: { source_photo: inventoryPhotos[aiEvidence.canned?.source_photo]?.Base64 },
+                juice: { source_photo: inventoryPhotos[aiEvidence.juice?.source_photo]?.Base64 },
+                coolers: { source_photo: inventoryPhotos[aiEvidence.coolers?.source_photo]?.Base64 },
+                pastry: { source_photo: inventoryPhotos[aiEvidence.pastry?.source_photo]?.Base64 }
+              }
+            },
+            layout_verification: {
+              sources: {
+                overviews_found: { source_photo: criticalPhotos.overviews?.[0]?.Base64 },
+                checkouts_found: { source_photo: criticalPhotos.checkouts?.[0]?.Base64 },
+                exteriors_gas: { source_photo: criticalPhotos.overviews?.[1]?.Base64 || criticalPhotos.overviews?.[0]?.Base64 }
+              }
             },
             rules: rules3x3
           },

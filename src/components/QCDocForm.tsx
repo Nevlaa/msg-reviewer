@@ -145,7 +145,7 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate, isAiRunnin
             <div className="qc-title">CONSENT</div>
             {(() => {
               const f = data?.results?.consent_form?.findings;
-              const source = data?.results?.compliance_checks?.ro_fields?.source_photos?.consent;
+              const source = data?.results?.consent_form?.source_photo;
               return (
                 <div className="qc-check-row">
                   <span>FNS / DATE / STORE NAME / 6 FIELDS</span>
@@ -162,7 +162,7 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate, isAiRunnin
             <div className="qc-title">SKETCH</div>
             {(() => {
               const f = data?.results?.sketch_validation?.findings;
-              const source = data?.results?.compliance_checks?.ro_fields?.source_photos?.sketch;
+              const source = data?.results?.sketch_validation?.source_photo;
               return (
                 <div className="qc-check-row">
                   <span>HPI STARS / LAYOUT / FNS HEADER</span>
@@ -178,7 +178,7 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate, isAiRunnin
           <div className="qc-box no-padding">
             <div className="qc-title">LAYOUT VERIFICATION</div>
             {['exteriors_gas', 'overviews_found', 'checkouts_found'].map(field => {
-               const source = data?.results?.compliance_checks?.ro_fields?.source_photos?.layout?.[field];
+               const source = data?.results?.compliance_checks?.layout_verification?.sources?.[field]?.source_photo;
                return (
                  <div className="qc-check-row" key={field}>
                    <span>{field.replace('_found', '').replace('_', ' ').toUpperCase()}</span>
