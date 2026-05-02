@@ -214,3 +214,15 @@ const endpoint = `${BASE_URL}/sobjects/Survey__c/${RECORD_ID}?fields=${fieldsPar
 ## 8. Next Steps for Validation Logic
 *   **Signage Cross-Check:** The AI agent compares the `Store_Name__c` (official) with the `Store_Name_as_Posted_on_Outside_Signage__c` (observed) to flag any rebranding or store name discrepancies.
 *   **Capacity Logic:** If the survey says there are 0 Freezers (`Freezers__c`), but the Food Inventory lists 20+ units of Frozen Meat, the agent should auto-generate a note flagging this as a logical inconsistency.
+
+---
+
+## 9. Inventory Calibration & Accuracy (Methodology)
+To ensure the AI maintains a "Senior Level 3" auditor persona, it must follow the established counting methodology illustrated in the reference examples.
+
+*   **Reference Examples:** [inventory_calibration_data.md](file:///c:/Users/shors/projects/msg-reviewer/docs/planning/inventory_calibration_data.md)
+*   **Methodology Rules:**
+    *   **Unit of Measure (UOM):** The AI must distinguish between "Weight (lb)", "Packs/Containers", and "Individual Units" as shown in the examples.
+    *   **Meats (Section 2):** Prioritize "Available by lb" for fresh butcher-cut meats.
+    *   **Variety Aggregation:** Flavors (Chocolate, Strawberry) and fat content (Whole, 2%, Skim) for the same product type (e.g., Milk) must be aggregated into a single variety count. They are **NOT** separate varieties.
+    *   **Accuracy Buffer:** Maintain a +/- 2 unit variance logic for system validation.

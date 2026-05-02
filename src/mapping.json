@@ -74,30 +74,30 @@
     "categories": {
       "bread": {
         "label": "Bread/Cereals",
-        "prefix": "BreadCereals_Variety_",
+        "prefix": "Bread_Cereals_Variety_",
         "countPrefix": "Count_BreadCereals_Variety_",
-        "ffrPrefix": "FFR_BreadCereals_",
+        "ffrPrefix": "FFR_BreadCereals_Variety_",
         "max": 10
       },
       "dairy": {
         "label": "Dairy",
         "prefix": "Dairy_Variety_",
         "countPrefix": "Count_Dairy_Variety_",
-        "ffrPrefix": "FFR_Dairy_",
+        "ffrPrefix": "FFR_Dairy_Variety_",
         "max": 10
       },
       "meat": {
         "label": "Meat/Poultry/Fish",
-        "prefix": "MPF_Variety_",
+        "prefix": "MeatsPoultryFish_Variety_",
         "countPrefix": "Count_MPF_Variety_",
-        "ffrPrefix": "FFR_MPF_",
+        "ffrPrefix": "FFR_MPF_Variety_",
         "max": 10
       },
       "produce": {
         "label": "Fruit/Veg",
-        "prefix": "FV_Variety_",
+        "prefix": "FruitVegetable_Variety_",
         "countPrefix": "Count_FV_Variety_",
-        "ffrPrefix": "FFR_FV_",
+        "ffrPrefix": "FFR_FV_Variety_",
         "max": 14
       }
     }

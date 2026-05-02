@@ -209,6 +209,20 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate, isAiRunnin
             )}
           </div>
 
+          {data?.results?.ffr_edits_comment && (
+            <div className="qc-box no-padding" style={{ marginBottom: '15px', borderLeft: '4px solid ' + (data.results.ffr_edits_comment.includes('Points removed') ? '#ef4444' : '#22c55e') }}>
+              <div className="qc-title" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>🎯 REVIEWER ACCURACY FEEDBACK</span>
+                <span style={{ fontSize: '0.65rem' }}>{data.results.ffr_edits_comment.includes('Points removed') ? '⚠️ DISCREPANCY' : '✅ PASS'}</span>
+              </div>
+              <div style={{ padding: '10px', background: data.results.ffr_edits_comment.includes('Points removed') ? '#fef2f2' : '#f0fdf4' }}>
+                <div style={{ fontSize: '0.75rem', color: '#334155', fontWeight: '500' }}>
+                  "{data.results.ffr_edits_comment}"
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="qc-box no-padding">
             <div className="qc-title">📋 STORE REVIEWER INVENTORY vs AI VERIFICATION</div>
             <div style={{ fontSize: '0.65rem', color: '#64748b', padding: '4px 8px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
@@ -238,13 +252,13 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate, isAiRunnin
                     // 3. Within +/- 2 units
                     const isCountClose = 
                       item.actual_found === item.expected ||
-                      (item.actual_found?.includes('+') && item.expected?.includes('+')) ||
+                      (String(item.actual_found || '').includes('+') && String(item.expected || '').includes('+')) ||
                       Math.abs(aiCountNum - sfCountNum) <= 2;
 
                     const hasMatch = item.match && item.ai_match_name;
                     
                     // 3x3/Threshold compliance: At least 3 units (or high volume)
-                    const meetsMinThreshold = aiCountNum >= 3 || (item.actual_found && item.actual_found.includes('+'));
+                    const meetsMinThreshold = aiCountNum >= 3 || String(item.actual_found || '').includes('+');
                     
                     const needsFFR = item.should_be_ffr;
                     const ffrOk = !needsFFR || item.ai_ffr_found;
@@ -398,6 +412,41 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate, isAiRunnin
                 ))}
               </tbody>
             </table>
+          </div>
+        </details>
+      )}
+
+      {/* STORE REVIEWER INVENTORY JSON PANEL (EXPECTED DATA) */}
+      {data?.results?.food_inventory && (
+        <details className="qc-box mt-15" style={{ background: '#0f172a', border: '1px solid #334155' }}>
+          <summary style={{ cursor: 'pointer', color: '#38bdf8', fontWeight: 'bold', padding: '0.75rem', fontSize: '0.85rem' }}>
+            📦 STORE REVIEWER INVENTORY (EXPECTED JSON)
+          </summary>
+          <div style={{ padding: '0 0.75rem 0.75rem' }}>
+            <div style={{ fontSize: '0.7rem', color: '#64748b', marginBottom: '0.5rem' }}>
+              Raw variety list as reported by the store reviewer in the field:
+            </div>
+            <pre style={{ 
+              background: '#1e293b', 
+              color: '#38bdf8', 
+              padding: '1rem', 
+              borderRadius: '6px', 
+              fontSize: '0.75rem', 
+              overflow: 'auto', 
+              maxHeight: '400px',
+              border: '1px solid #0ea5e9'
+            }}>
+              {JSON.stringify({
+                fns_number: data.record_id,
+                inventory_summary: data.results.food_inventory.map((item: any) => ({
+                  category: item.category,
+                  item: item.item,
+                  expected_count: item.expected,
+                  unit_type: item.item?.toLowerCase().includes('lb') ? 'Weight (lb)' : 'Units/Packs',
+                  ffr_required: item.should_be_ffr
+                }))
+              }, null, 2)}
+            </pre>
           </div>
         </details>
       )}

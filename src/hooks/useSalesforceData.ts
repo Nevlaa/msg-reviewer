@@ -152,6 +152,7 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
           const itemFFRField = `${cat.ffrPrefix}${i}__c`;
           
           const itemName = inventory[itemNameField];
+          console.log(`DEBUG: Checking Category[${catKey}] Field[${itemNameField}]:`, itemName);
           if (itemName && itemName !== 'None' && itemName !== '') {
             const isFFRChecked = !!inventory[itemFFRField];
             const lowerItem = itemName.toLowerCase();
@@ -178,6 +179,8 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
           }
         }
       });
+      console.log('DEBUG: Final Food Results Count:', foodResults.length);
+      console.log('DEBUG: Categories Found:', [...new Set(foodResults.map(f => f.category))]);
 
       // Calculate 3x3 Compliance
       const check3x3 = (category: string) => {
@@ -493,8 +496,11 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
       console.log(`AI: Sending ${inventoryPhotos.length} of ${photos.length} photos to inventory sweep (excluded ${photos.length - inventoryPhotos.length} critical).`);
 
       const inventoryParts = await Promise.all(inventoryPhotos.map(convertToPart));
-      const expectedList = validationLog.results.food_inventory.map(i => i.item);
-      const inventoryFindings = await vision.analyzeInventory(inventoryParts, expectedList);
+      const expectedData = validationLog.results.food_inventory.map(i => ({ 
+        item: i.item, 
+        should_be_ffr: !!i.should_be_ffr 
+      }));
+      const inventoryFindings = await vision.analyzeInventory(inventoryParts, expectedData);
 
       // ---------------------------------------------------------
       // FINAL AUDIT CONSOLIDATION
@@ -555,6 +561,24 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
         const found = matchIdx !== -1 ? aiInventory[matchIdx] : null;
         if (matchIdx !== -1) usedAiIndices.add(matchIdx);
 
+        // Accuracy Buffer Logic: +/- 2 units is a match.
+        // "20+" is treated as 20 for math, but matches any "20+" or "10+" from AI.
+        const parseCount = (c: any) => {
+          if (!c || c === 'Pending AI Scan') return 0;
+          if (typeof c === 'string' && c.includes('20+')) return 20;
+          if (typeof c === 'string' && c.includes('10+')) return 10;
+          const n = parseInt(c);
+          return isNaN(n) ? 0 : n;
+        };
+
+        const expCount = parseCount(item.expected);
+        const actCount = parseCount(found?.count);
+        const diff = Math.abs(expCount - actCount);
+        
+        // Match if within buffer, or both are high-volume (20+)
+        const isMatch = (item.expected === '20+' && (found?.count === '20+' || found?.count === '10+')) || 
+                        (diff <= 2);
+
         if (found) {
           const photoIndex = typeof found.source_photo === 'number' ? found.source_photo : parseInt(found.source_photo);
           const photo = inventoryPhotos[photoIndex];
@@ -564,13 +588,13 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
             ai_match_name: found.item,
             ai_confidence: found.confidence,
             ai_ffr_found: found.ffr_found,
-            match: true,
+            match: isMatch,
             should_be_ffr: item.should_be_ffr || found.ffr_found,
             source_photo: photo?.Base64,
             source_photo_title: photo?.Title || `Photo ${photoIndex}`
           };
         }
-        return { ...item, ai_match_name: null, ai_ffr_found: false, source_photo_title: null };
+        return { ...item, ai_match_name: null, ai_ffr_found: false, match: false, source_photo_title: null };
       });
 
       const hasFFRIssues = updatedInventory.some(item => item.should_be_ffr && !item.ffr);
@@ -586,13 +610,17 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
                          aiQuality.status === "Poor" ? 5 : 
                          15 - (missingEvidence.length * 2);
 
-      const ffrFailures = updatedInventory
-        .filter(item => item.should_be_ffr && !item.ffr)
+      const ffrMismatches = updatedInventory
+        .filter(item => item.ai_ffr_found && !item.ffr)
         .map(item => item.item);
+
+      const countScore = Math.max(1, 15 - (ffrMismatches.length * 2));
+      const ffrComment = ffrMismatches.length > 0 
+        ? `Points removed: Reviewer failed to mark FFR status for ${ffrMismatches.join(", ")}. AI confirmed items are Refrigerated/Frozen.`
+        : "Inventory FFR status matches AI verification.";
 
       const isDocsCompliant = isSketchPass && isConsentPass;
       const docScore = isDocsCompliant ? 15 : 1;
-      const countScore = ffrFailures.length > 0 ? 12 : 15;
 
       // 10. Re-Evaluate 3x3 Rules based on AI Counts
       const check3x3Status = (category: string) => {
@@ -658,6 +686,7 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
         ...validationLog,
         results: {
           ...validationLog.results,
+          ffr_edits_comment: ffrComment,
           location_verification: {
             ...validationLog.results.location_verification,
             ai_architectural_match: criticalFindings?.exterior?.architectural_match || "N/A",
@@ -738,9 +767,9 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
         suggested_qc_scores: {
           ...validationLog.suggested_qc_scores,
           Quality_Count__c: countScore,
-          Quality_Count_Feedback__c: ffrFailures.length === 0 
+          Quality_Count_Feedback__c: ffrMismatches.length === 0 
             ? "AI AUDIT: 100% variety and FFR compliance confirmed."
-            : `AI AUDIT ALERT: Missing FFR on: ${ffrFailures.join(", ")}.`,
+            : `AI AUDIT ALERT: Missing FFR on: ${ffrMismatches.join(", ")}.`,
           
           Quality_Food_Photos__c: photoScore,
           Quality_Food_Photos_Feedback__c: photoScore === 15 

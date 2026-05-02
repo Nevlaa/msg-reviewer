@@ -70,28 +70,32 @@ export class VisionService {
   /**
    * Batch 2: High-Variety Accumulator
    */
-  async analyzeInventory(imageParts: any[], expectedCategories: any[]): Promise<any> {
+   async analyzeInventory(imageParts: any[], expectedInventory: { item: string, should_be_ffr: boolean }[]): Promise<any> {
     const prompt = `You are a SENIOR LEVEL 3 QC AUDITOR performing a USDA SNAP 3x3 or 10/10/10/14 VARIETY COUNT audit.
     
     CRITICAL TAXONOMY RULES:
     - CATEGORIZATION: Use the "First Ingredient Rule" for mixed foods.
-    - DAIRY VARIETIES: Chocolate Milk, Strawberry Milk, and Dairy-based Protein Shakes (e.g., Core Power, Fairlife) COUNT as distinct varieties.
+    - THE CONSOLIDATION RULE: Aggregate different storage types (Canned vs. Frozen) and flavors/fat-content (Whole vs. 2%) of the same product type into a SINGLE variety count. 
+    - FFR INHERITANCE: If a variety contains both Canned and Frozen items, set ffr_found=true for the entire variety.
+    - FFR ALIGNMENT RULE: You MUST respect the temperature status. If an item is NOT marked as FFR in the provided list, do NOT match it to items seen inside freezers or coolers. 
+    - TAXONOMY ISOLATION: Do NOT cross-match categories. "Eggs" are NOT "Chicken". "Tuna" is NOT "Salmon".
     - EXCLUSIONS: Do NOT count Accessory Foods (Chips, Candy, Soda) or Hot Prepared Foods.
-    - PRIORITY: Prioritize FFR (Fresh, Frozen, Refrigerated) items first.
     
     CATEGORIES:
     1. "Bread/Cereals": Rice, Oats, Bread, Tortillas, Cereals, Pasta, Ramen.
-    2. "Dairy": Milk (Whole, 2%, Skim), Flavored Milk (Chocolate), Protein Shakes (Dairy-based), Yogurt, Cheese, Butter.
-    3. "Meat/Poultry/Fish": Beef, Chicken, Pork, Salmon, Tuna, Eggs, Jerky, SPAM.
+    2. "Dairy": Milk - Dairy (Aggregated), Yogurt (Aggregated), Cheese, Butter, Eggs.
+    3. "Meat/Poultry/Fish": Beef, Chicken, Pork, Salmon, Tuna, Jerky, SPAM.
     4. "Fruit/Veg": Apples, Bananas, Tomatoes, Potatoes, 100% Juice, Canned Veg.
 
     STEP 1: INVENTORY & UNIT COUNTING (CRITICAL)
-    - Survey list to verify: ${expectedCategories.join(", ")}.
-    - For EVERY distinct variety, count units. 
-    - DISTINCT VARIETY RULE: Whole Milk, 2% Milk, and Chocolate Milk are 3 DIFFERENT varieties. Fairlife Chocolate vs Core Power Vanilla are DIFFERENT varieties.
+    - Survey list to verify (Item Name | Expected FFR Status):
+      ${expectedInventory.map(i => `- ${i.item} (Is FFR: ${i.should_be_ffr})`).join("\n      ")}
+
+    - For EVERY variety in the list, count units found in the images.
+    - AGGREGATION EXAMPLE: If you see 5 cans of Tuna and 2 bags of Frozen Tuna, the variety "Tuna" has a count of 7 and ffr_found=true.
     - DEPTH ASSUMPTION: If items are in rows or stacked, assume depth. Use "10+" or "20+" if the row/stack looks deep.
     - VOLUME CAP: Use "20+" for 20+ units.
-    - Set ffr_found=true if item is inside a cooler or freezer.
+    - IMAGE INTEGRITY: Do NOT satisfy the entire list from a single image (e.g., Image 100009860) unless the items are clearly present. If an item is expected as Shelf Stable (FFR: false) and you only see a freezer, return count 0 for that item.
     
     STEP 2: STAPLE AREA EVIDENCE
     - "jerky": Jerky/Meat sticks

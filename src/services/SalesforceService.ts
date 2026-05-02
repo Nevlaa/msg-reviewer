@@ -68,7 +68,14 @@ export class SalesforceService {
   }
 
   async getFoodInventory(id: string): Promise<SalesforceFoodInventory> {
-    return this.fetchFromSalesforce(`/services/data/v60.0/sobjects/Food_Inventory__c/${id}`);
+    // Instead of direct sobject fetch, use a query to see if fields are hidden
+    // but first, let's get the raw object to see what's actually there
+    const raw = await this.fetchFromSalesforce<any>(`/services/data/v60.0/sobjects/Food_Inventory__c/${id}`);
+    const allKeys = Object.keys(raw);
+    console.log('DEBUG: SEARCHING FOR MISSING CATEGORY FIELDS...');
+    console.log('  Meat/MPF Matches:', allKeys.filter(k => k.toLowerCase().includes('meat') || k.toLowerCase().includes('mpf')));
+    console.log('  Fruit/Veg/FV Matches:', allKeys.filter(k => k.toLowerCase().includes('fruit') || k.toLowerCase().includes('veg')));
+    return raw;
   }
 
   /**

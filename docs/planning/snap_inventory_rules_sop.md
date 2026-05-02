@@ -66,7 +66,15 @@ This document serves as the ground-truth logic for the AI Auditor when performin
 - **Prohibited**: Alcohol, Tobacco, Hot Prepared Foods (Ready-to-eat).
 - **Non-Food**: Cleaning supplies, Paper goods.
 
-## 6. AI Counting Strategy
+## 6. Variety Aggregation (The "Consolidation" Rule)
+To prevent "Variety Hallucinations," flavors and fat-content variations must be consolidated:
+- **Milk (Dairy)**: Whole, 2%, Skim, Chocolate, Strawberry, and Dairy-based Protein Shakes = **1 Variety** (Milk - Dairy).
+- **Yogurt**: Strawberry, Blueberry, Plain, Greek = **1 Variety** (Yogurt).
+- **Bread**: White, Wheat, Honey Wheat, Sliced, Loaf = **1 Variety** (Bread).
+- **Rule**: If the only difference is flavor or fat percentage, it is **NOT** a new variety.
+- **Exceptions**: Plant-based milks (Almond vs. Soy vs. Oat) **ARE** distinct varieties from each other and from Dairy Milk.
+
+## 7. AI Counting Strategy
 1. **Pass 1 (Perimeter)**: Scan coolers and freezers (FFR) first.
 2. **Pass 2 (Center Aisle)**: Fill gaps using shelf-stable foods (Canned, Grains).
 3. **Variety Verification**: Ensure 3 distinct brands/types per category if possible.
