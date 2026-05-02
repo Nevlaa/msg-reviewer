@@ -552,15 +552,6 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
           });
         }
 
-        // 3. Fallback to broad category match ONLY if no specific matches found
-        if (matchIdx === -1) {
-          matchIdx = aiInventory.findIndex((f: any, idx: number) => {
-            if (usedAiIndices.has(idx)) return false;
-            const fCat = (f.category || '').toLowerCase();
-            return fCat === catLower;
-          });
-        }
-
         const found = matchIdx !== -1 ? aiInventory[matchIdx] : null;
         if (matchIdx !== -1) usedAiIndices.add(matchIdx);
 
