@@ -369,10 +369,27 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
       const fetchImageFromLink = async (url: string): Promise<{ base64: string; part: any } | null> => {
         if (!url) return null;
         try {
-          const response = await fetch(url, {
+          // Detect if this is a Salesforce distribution link and extract ContentVersion ID
+          // IDs in Salesforce usually start with 068 (ContentVersion)
+          const cvIdMatch = url.match(/[?&]ids=(068[a-zA-Z0-9]{12,15})/);
+          let fetchUrl = url;
+          
+          if (cvIdMatch) {
+            const cvId = cvIdMatch[1];
+            // Use the proxy configured in vite.config.ts to avoid CORS
+            fetchUrl = `/services/data/v60.0/sobjects/ContentVersion/${cvId}/VersionData`;
+            console.log(`AI: Detected Salesforce ContentLink, rerouting through proxy: ${cvId}`);
+          }
+
+          const response = await fetch(fetchUrl, {
             headers: { 'Authorization': `Bearer ${bearerToken}` }
           });
-          if (!response.ok) return null;
+          
+          if (!response.ok) {
+            console.warn(`AI: Failed to fetch image (Status: ${response.status}) from: ${fetchUrl}`);
+            return null;
+          }
+          
           const blob = await response.blob();
           const base64 = await new Promise<string>((resolve, reject) => {
             const reader = new FileReader();
