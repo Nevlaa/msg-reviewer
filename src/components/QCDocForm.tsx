@@ -232,7 +232,7 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate, isAiRunnin
                     const count = parseInt(item.actual_found) || 0;
                     const countStr = item.actual_found || '—';
                     const hasMatch = item.match && item.ai_match_name;
-                    const meetsThreshold = count >= 3 || item.actual_found === '10+';
+                    const meetsThreshold = count >= 3 || item.actual_found === '10+' || item.actual_found === '20+';
                     const needsFFR = item.should_be_ffr;
                     const ffrOk = !needsFFR || item.ai_ffr_found;
                     const rowPass = hasMatch && meetsThreshold && ffrOk;

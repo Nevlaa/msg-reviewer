@@ -71,52 +71,39 @@ export class VisionService {
    * Batch 2: High-Variety Accumulator
    */
   async analyzeInventory(imageParts: any[], expectedCategories: any[]): Promise<any> {
-    const prompt = `You are a SENIOR LEVEL 3 QC AUDITOR performing a USDA SNAP 3x3 VARIETY COUNT audit.
+    const prompt = `You are a SENIOR LEVEL 3 QC AUDITOR performing a USDA SNAP 3x3 or 10/10/10/14 VARIETY COUNT audit.
     
-    CRITICAL TAXONOMY RULES (Use these categories ONLY):
-    1. "Bread/Cereals": 
-       - Flours/Grains: Rice, Quinoa, Barley, Buckwheat, Oats, Millet, Teff, Wheat/Corn Flour.
-       - Baked: Bagels, Loaf Bread, Buns/Rolls, Pitas/Naan, Tortillas.
-       - Cereals: Cold/Hot Cereals, Grits, Oatmeal, Infant Cereals.
-       - Pasta: Pasta/Ramen, Rice Noodles.
-       - *Include: Ritz, Saltines, Cookies, Donuts, Pastries, Little Debbie.*
-
-    2. "Dairy": 
-       - Dairy: Milk, Cheese, Yogurt, Butter, Sour Cream, Ghee.
-       - Plant-Based: Almond/Soy/Oat/Coconut/Rice/Cashew Milk & Yogurt & Cheese.
-       - Other: Dairy nutrition bars, Infant Formula (Dairy/Soy), Margarine.
-
-    3. "Meat/Poultry/Fish": 
-       - Land: Beef, Chicken, Pork, Turkey, Lamb, Goat, Duck, Rabbit, Venison, Bison, Camel, Kangaroo.
-       - Seafood: Salmon, Tuna, Shrimp, Tilapia, Cod, Catfish, Crab, Lobster, Oysters, Sardines, Swai, Trout, Whiting.
-       - Eggs: Chicken/Duck/Quail Eggs.
-       - *Include: Jerky (Slim Jim, Jack Link's), SPAM, Vienna Sausages, Canned Meats.*
-
-    4. "Fruit/Veg": 
-       - Fruit: Apples, Bananas, Oranges, Berries, Grapes, Mangoes, Melons, Pineapple, Peaches, Pears, Plantains, Dragon Fruit, Kiwi.
-       - Veg: Tomatoes, Potatoes, Onions, Peppers, Corn, Carrots, Broccoli, Lettuce, Mushrooms, Beans/Soy, Peas, Kale, Spinach.
-       - *Include: 100% Juice, Canned/Frozen Fruits & Veg.*
+    CRITICAL TAXONOMY RULES:
+    - CATEGORIZATION: Use the "First Ingredient Rule" for mixed foods (e.g., Chicken Noodle Soup = Meat, Tomato Soup = Vegetable).
+    - EXCLUSIONS: Do NOT count Accessory Foods (Chips, Candy, Soda) or Hot Prepared Foods.
+    - PRIORITY: Prioritize FFR (Fresh, Frozen, Refrigerated) items first.
+    
+    CATEGORIES (Use these ONLY):
+    1. "Bread/Cereals": Rice, Quinoa, Oats, Bagels, Loaf Bread, Tortillas, Cereals, Pasta, Ramen. (Inc. Crackers, Pastries).
+    2. "Dairy": Milk, Cheese, Yogurt, Butter, Ghee. (Inc. Almond/Soy/Oat alternatives, Infant Formula).
+    3. "Meat/Poultry/Fish": Beef, Chicken, Pork, Turkey, Salmon, Tuna, Shrimp, Eggs. (Inc. Jerky, SPAM, Canned Meats).
+    4. "Fruit/Veg": Apples, Bananas, Oranges, Tomatoes, Potatoes, Onions, Peppers, 100% Juice. (Inc. Canned/Frozen).
 
     STEP 1: INVENTORY & UNIT COUNTING (CRITICAL)
     - Survey list to verify: ${expectedCategories.join(", ")}.
-    - For EVERY distinct variety visible, count units on shelves.
-    - If stacked or in rows, assume depth — use "10+" if more than 10.
+    - For EVERY distinct variety, count units.
+    - VOLUME CAP: Use "20+" for any variety with 20 or more units. NEVER return a count higher than 20.
     - DISTINCT VARIETY RULE: Whole Milk vs 2% Milk = 2 varieties. White Bread vs Wheat Bread = 2 varieties.
     - Set ffr_found=true if item is inside a cooler, fridge, or freezer.
     
     STEP 2: STAPLE AREA EVIDENCE (scan ALL photos)
-    - "jerky": Slim Jim, Jack Link's, beef jerky, meat sticks on any shelf or rack
-    - "canned": Any canned food shelves (soup, beans, tuna, SPAM, Vienna sausages)
-    - "chips": Chips, Doritos, Lays, Cheetos, Bugles, Combos, Chex Mix, snack bags
-    - "milk_eggs": Milk jugs, egg cartons, cheese, yogurt in coolers or fridges
-    - "juice": Juice bottles, juice boxes, Gatorade, lemonade
-    - "coolers": ANY glass-door refrigerator, walk-in cooler, fridge, freezer door — beer coolers count too
-    - "pastry": Bread loaves, buns, donuts, Little Debbie, muffins, pastries, cakes
+    - "jerky": Jerky/Meat sticks
+    - "canned": Canned meat/veg/soup
+    - "chips": ACCESSORY snack bags (for context only)
+    - "milk_eggs": Dairy/Eggs in coolers
+    - "juice": 100% Juice bottles
+    - "coolers": Any glass-door fridge/freezer
+    - "pastry": Bread/Pastries/Baked goods
 
     Return STRICT JSON:
     {
       "inventory": [
-        { "item": "Variety Name", "category": "Category", "count": "number or 10+", "ffr_found": boolean, "source_photo": 0, "confidence": 0.9 }
+        { "item": "Variety Name", "category": "Category", "count": "number or 20+", "ffr_found": boolean, "source_photo": 0, "confidence": 0.9 }
       ],
       "evidence_found": {
         "jerky": { "found": boolean, "source_photo": 0 },
