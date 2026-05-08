@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { VisionService } from '../services/VisionService';
 
 export const StoreReviewerWorkstation: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]);

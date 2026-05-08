@@ -88,10 +88,12 @@ export class VisionService {
     4. "Fruit/Veg": Apples, Bananas, Tomatoes, Potatoes, 100% Juice, Canned Veg.
 
     STEP 1: INVENTORY & UNIT COUNTING (CRITICAL)
-    - Survey list to verify (Item Name | Expected FFR Status):
+    - You must perform a COMPREHENSIVE SCAN of the images and identify ALL staple food varieties present.
+    - Here is the Store Reviewer's reported list to verify (Item Name | Expected FFR Status):
       ${expectedInventory.map(i => `- ${i.item} (Is FFR: ${i.should_be_ffr})`).join("\n      ")}
 
-    - For EVERY variety in the list, count units found in the images.
+    - TASK A: For EVERY variety in the reviewer's list above, find it and count the units in the images.
+    - TASK B: Identify and count ANY OTHER staple food varieties visible in the images that are NOT on the list above. Add them to your findings.
     - AGGREGATION EXAMPLE: If you see 5 cans of Tuna and 2 bags of Frozen Tuna, the variety "Tuna" has a count of 7 and ffr_found=true.
     - DEPTH ASSUMPTION: If items are in rows or stacked, assume depth. Use "10+" or "20+" if the row/stack looks deep.
     - VOLUME CAP: Use "20+" for 20+ units.
@@ -180,10 +182,10 @@ export class VisionService {
     }
   }
 
-  async analyzeSketch(imagePart: any, context: any): Promise<any> {
+  async analyzeSketch(sketchImageBase64: any): Promise<any> {
     const prompt = `Analyze sketch for FNS, Entrance, Checkouts, and HPI Stars. Return JSON.`;
     try {
-      const result = await this.model.generateContent([prompt, imagePart]);
+      const result = await this.model.generateContent([prompt, sketchImageBase64]);
       const response = await result.response;
       const text = response.text();
       const jsonMatch = text.match(/\{[\s\S]*\}/);

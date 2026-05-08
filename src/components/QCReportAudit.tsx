@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { SNAPScanReport, ValidationStatus, ChecklistItem } from '../types';
+import type { SNAPScanReport, ValidationStatus } from '../types';
 
 interface QCReportAuditProps {
   report: SNAPScanReport;
@@ -9,8 +9,8 @@ interface QCReportAuditProps {
 export const QCReportAudit: React.FC<QCReportAuditProps> = ({ report, onUpdateReport }) => {
   const [activeSection, setActiveSection] = useState<'critical' | 'food' | 'comments' | 'corrections'>('critical');
   const [corrections, setCorrections] = useState<Record<string, number>>({});
-  const [formCorrection, setFormCorrection] = useState('');
-  const [sketchNotes, setSketchNotes] = useState('');
+  const [, setFormCorrection] = useState('');
+  const [, setSketchNotes] = useState('');
 
   const updateChecklistItem = (id: string, status: ValidationStatus) => {
     if (!report.audit_result) return;
@@ -148,7 +148,7 @@ export const QCReportAudit: React.FC<QCReportAuditProps> = ({ report, onUpdateRe
                   <div key={category} className="inventory-category">
                     <h4>{category.replace(/_/g, ' ').toUpperCase()}</h4>
                     <div className="inventory-list">
-                      {items.map((item, idx) => (
+                      {(items as any[]).map((item: any, idx: number) => (
                         <div key={idx} className="inventory-row-detailed">
                           <div className="item-meta">
                             <span className="variety-name">{item.variety}</span>

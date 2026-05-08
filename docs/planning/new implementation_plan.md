@@ -226,3 +226,10 @@ To ensure the AI maintains a "Senior Level 3" auditor persona, it must follow th
     *   **Meats (Section 2):** Prioritize "Available by lb" for fresh butcher-cut meats.
     *   **Variety Aggregation:** Flavors (Chocolate, Strawberry) and fat content (Whole, 2%, Skim) for the same product type (e.g., Milk) must be aggregated into a single variety count. They are **NOT** separate varieties.
     *   **Accuracy Buffer:** Maintain a +/- 2 unit variance logic for system validation.
+229: 
+230: ---
+231: 
+232: ## 11. Future Roadmap
+233: Future enhancements and long-term goals are tracked in the [Future Features Roadmap](file:///c:/Users/shors/projects/msg-reviewer/docs/planning/future_features.md).
+234: 
+235: *   **Real-Time AI Scanning:** Moving inventory counting to the field app stage to automate variety counts during photo capture.

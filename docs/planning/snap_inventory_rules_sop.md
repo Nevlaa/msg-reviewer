@@ -79,3 +79,51 @@ To prevent "Variety Hallucinations," flavors and fat-content variations must be 
 2. **Pass 2 (Center Aisle)**: Fill gaps using shelf-stable foods (Canned, Grains).
 3. **Variety Verification**: Ensure 3 distinct brands/types per category if possible.
 4. **Volume Check**: Use "10+" for stacked rows; cap at 20.
+
+## 8. Acceptable Staple Food Varieties Reference
+Variety is generally defined by the product kind or main ingredient.
+
+### 1. Vegetables or Fruits
+Variety is generally defined by the product kind or main ingredient.
+*   **Potatoes** (e.g., fresh potatoes, frozen tater tots)
+*   **Oranges** (e.g., 100% orange juice, fresh oranges)
+*   **Tomatoes** (e.g., canned tomato soup, sun-dried tomatoes)
+*   **Apples** (e.g., dried apples, pre-cut apple go-packs)
+*   **Pumpkin** (e.g., canned pumpkin, fresh whole pumpkin)
+*   **Bananas** (e.g., fresh bananas, frozen bananas)
+*   **Lettuce** (e.g., fresh head of iceberg, bagged romaine)
+*   **Pineapples** (e.g., canned pineapple rings, fresh whole pineapple)
+
+### 2. Meat, Poultry, or Fish
+The first ingredient determines the variety for multiple-ingredient products.
+*   **Turkey** (e.g., deli-sliced, ground turkey)
+*   **Chicken** (e.g., fresh cutlets, frozen nuggets)
+*   **Beef** (e.g., ground beef, beef jerky)
+*   **Tuna** (e.g., fresh steak, canned tuna)
+*   **Catfish** (e.g., frozen filets, smoked packaged catfish)
+*   **Lamb/Mutton** (e.g., fresh chops, ground lamb)
+*   **Pork** (e.g., loin, fresh sliced ham)
+*   **Chicken Eggs** (e.g., fresh eggs, liquid egg whites)
+
+### 3. Dairy Products
+Includes plant-based alternatives and infant formula as specific varieties.
+*   **Cheese** (e.g., cheddar slices, grated parmesan)
+*   **Milk** (e.g., skim, whole milk)
+*   **Almond-based milk** (e.g., refrigerated or shelf-stable)
+*   **Butter** (e.g., salted or frozen sweet cream)
+*   **Butter substitute** (e.g., margarine, non-dairy spread)
+*   **Sour cream** (e.g., lite, organic)
+*   **Yogurt** (e.g., French vanilla, nonfat peach)
+*   **Infant formula** (e.g., liquid ready-to-feed, powdered milk formula)
+*   **Soy infant formula** (e.g., liquid or powdered soy formula)
+
+### 4. Breads or Cereals
+*   **Bread** (e.g., rye, multigrain)
+*   **Pasta** (e.g., gluten-free spaghetti, whole wheat rotini)
+*   **Tortillas** (e.g., corn, flour)
+*   **Bagels** (e.g., poppy seed, plain)
+*   **Pitas** (e.g., low-carb, whole wheat)
+*   **Cold breakfast cereal** (e.g., rice-based, oat-based)
+*   **Buns/rolls** (e.g., frozen dinner rolls, hot dog buns)
+*   **Infant cereal** (e.g., wheat-based, oat-based)
+*   **Rice** (e.g., bagged rice, rice-based frozen meals)

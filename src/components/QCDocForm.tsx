@@ -251,11 +251,12 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate, isAiRunnin
                     // 2. Both are high volume (10+ or 20+)
                     // 3. Within +/- 2 units
                     const isCountClose = 
+                      item.reviewer_missed ||
                       item.actual_found === item.expected ||
                       (String(item.actual_found || '').includes('+') && String(item.expected || '').includes('+')) ||
                       Math.abs(aiCountNum - sfCountNum) <= 2;
 
-                    const hasMatch = item.match && item.ai_match_name;
+                    const hasMatch = item.reviewer_missed || (item.match && item.ai_match_name);
                     
                     // 3x3/Threshold compliance: At least 3 units (or high volume)
                     const meetsMinThreshold = aiCountNum >= 3 || String(item.actual_found || '').includes('+');
@@ -269,20 +270,20 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate, isAiRunnin
                     return (
                       <tr key={idx} style={{ 
                         borderBottom: '1px solid #e2e8f0',
-                        background: hasMatch ? (rowPass ? '#f0fdf4' : '#fefce8') : '#fef2f2'
+                        background: item.reviewer_missed ? '#eff6ff' : (hasMatch ? (rowPass ? '#f0fdf4' : '#fefce8') : '#fef2f2')
                       }}>
                         <td style={{ padding: '5px 6px', fontSize: '0.6rem', color: '#64748b' }}>{item.category}</td>
                         <td style={{ padding: '5px 6px' }}>
-                          <strong>{item.item || 'Unknown'}</strong>
-                          {item.expected && <span style={{ color: '#94a3b8', fontSize: '0.6rem', marginLeft: '4px' }}>(exp: {item.expected})</span>}
+                          <strong>{item.reviewer_missed ? '--- (Missed)' : (item.item || 'Unknown')}</strong>
+                          {!item.reviewer_missed && item.expected && <span style={{ color: '#94a3b8', fontSize: '0.6rem', marginLeft: '4px' }}>(exp: {item.expected})</span>}
                         </td>
-                        <td style={{ padding: '5px 6px', color: hasMatch ? '#059669' : '#dc2626', fontStyle: hasMatch ? 'normal' : 'italic' }}>
-                          {hasMatch ? item.ai_match_name : 'Not found in images'}
+                        <td style={{ padding: '5px 6px', color: item.reviewer_missed ? '#2563eb' : (hasMatch ? '#059669' : '#dc2626'), fontStyle: (hasMatch || item.reviewer_missed) ? 'normal' : 'italic', fontWeight: item.reviewer_missed ? 'bold' : 'normal' }}>
+                          {item.reviewer_missed ? `AI Found: ${item.ai_match_name}` : (hasMatch ? item.ai_match_name : 'Not found in images')}
                         </td>
                         <td style={{ padding: '5px 6px', textAlign: 'center', fontWeight: 'bold' }}>
                           <span style={{ 
-                            color: isCountClose ? '#059669' : '#dc2626',
-                            background: isCountClose ? '#d1fae5' : '#fee2e2',
+                            color: item.reviewer_missed ? '#2563eb' : (isCountClose ? '#059669' : '#dc2626'),
+                            background: item.reviewer_missed ? '#dbeafe' : (isCountClose ? '#d1fae5' : '#fee2e2'),
                             padding: '1px 6px',
                             borderRadius: '3px',
                             fontSize: '0.7rem'
@@ -324,12 +325,15 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate, isAiRunnin
               {data?.results?.food_inventory?.length > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 8px', background: '#f1f5f9', fontSize: '0.65rem', color: '#475569', borderTop: '2px solid #cbd5e1' }}>
                   <span>
-                    <strong>Matched:</strong> {data.results.food_inventory.filter((i: any) => i.match).length} / {data.results.food_inventory.length} items
+                    <strong>Matched:</strong> {data.results.food_inventory.filter((i: any) => i.match && !i.reviewer_missed).length} / {data.results.food_inventory.filter((i: any) => !i.reviewer_missed).length} items
+                  </span>
+                  <span style={{ color: '#2563eb' }}>
+                    <strong>Missed by Reviewer:</strong> {data.results.food_inventory.filter((i: any) => i.reviewer_missed).length}
                   </span>
                   <span>
                     <strong>3x3 Pass:</strong> {data.results.food_inventory.filter((i: any) => i.match && (parseInt(i.actual_found) >= 3 || i.actual_found === '10+')).length} items
                   </span>
-                  <span>
+                  <span style={{ color: data.results.food_inventory.filter((i: any) => i.should_be_ffr && !i.ai_ffr_found).length > 0 ? '#dc2626' : 'inherit' }}>
                     <strong>FFR Issues:</strong> {data.results.food_inventory.filter((i: any) => i.should_be_ffr && !i.ai_ffr_found).length}
                   </span>
                 </div>

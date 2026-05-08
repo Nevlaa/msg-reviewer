@@ -39,6 +39,9 @@ export type ValidationLog = {
       google_maps_link: string;
       street_view_image: string;
       exterior_photo: string;
+      ai_architectural_match?: string;
+      geospatial_confidence?: number;
+      source_photo?: string;
     };
     compliance_checks: {
       store_info_match: {
@@ -70,6 +73,28 @@ export type ValidationLog = {
         hpi_list: { desc: string; units: string }[];
         formula_list: { desc: string; units: string }[];
       };
+      evidence?: {
+        canned: boolean;
+        coolers: boolean;
+        juice: boolean;
+        milk: boolean;
+        chips: boolean;
+        jerky: boolean;
+        nuts?: boolean;
+        granola?: boolean;
+        pastry: boolean;
+        sources?: Record<string, { source_photo: string }>;
+      };
+      rules?: {
+        '3x3_grains': boolean;
+        '3x3_dairy': boolean;
+        '3x3_meats': boolean;
+        '3x3_produce': boolean;
+        '3x3_notes'?: string;
+      };
+      layout_verification?: {
+        sources: Record<string, { source_photo: string }>;
+      };
     };
     food_inventory: {
       category: string;
@@ -79,8 +104,17 @@ export type ValidationLog = {
       ffr: boolean;
       should_be_ffr?: boolean;
       match: boolean;
-      evidence_photo?: string;
+      ai_match_name?: string | null;
+      ai_confidence?: number;
+      ai_ffr_found?: boolean;
+      source_photo?: string;
+      source_photo_title?: string | null;
+      reviewer_missed?: boolean;
     }[];
+    ffr_edits_comment?: string;
+    scanned_photos?: string[];
+    photo_manifest?: any[];
+    ai_raw_response?: any;
     sketch_validation: {
       link: string;
       sop_compliant: boolean;
@@ -95,6 +129,7 @@ export type ValidationLog = {
         low_inv_match: boolean;
       };
       error?: string;
+      source_photo?: string;
     };
     consent_form: {
       status: string;
@@ -108,6 +143,7 @@ export type ValidationLog = {
         entire_form_visible: boolean;
       };
       error?: string;
+      source_photo?: string;
     };
   };
   suggested_qc_scores: {

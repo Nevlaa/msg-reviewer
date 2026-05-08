@@ -51,5 +51,6 @@ STRICT SOP HARD RULES:
 - DISTINCT VARIETIES: Count Beans, Green Beans, and Peas as THREE SEPARATE VARIETIES.
 - THE JUICE LINE: 100% Juice is STAPLE. Any blend < 100% is ACCESSORY (Exclude).
 - THE PERISHABLE BIAS: Prioritize reporting Perishable (FFR) varieties over shelf-stable to satisfy USDA depth-of-stock rules.
-- EGG RULE: Chicken Eggs are Dairy/MPF priority. Pickled eggs in jars are shelf-stable unless refrigerated.`;
+- EGG RULE: Chicken Eggs are Dairy/MPF priority. Pickled eggs in jars are shelf-stable unless refrigerated.
+- VARIETY DEFINITION: Variety is defined by product kind or main ingredient (e.g., Potatoes, Beef, Milk). Plant-based milks and infant formula are distinct varieties. For multi-ingredient products, the first ingredient determines the variety. Consolidation is mandatory (e.g., all cow milk = 1 variety).`;
 };

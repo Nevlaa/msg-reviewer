@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { SalesforceService } from '../services/SalesforceService';
 import { VisionService } from '../services/VisionService';
-import type { SalesforceSurvey, SalesforceFoodInventory, ValidationLog } from '../salesforceTypes';
+import type { SalesforceSurvey, ValidationLog } from '../salesforceTypes';
 import mapping from '../mapping.json';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
@@ -116,9 +116,12 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
         storage_area_sf: getVal(survey, mapping.survey_object.fields.storage_area_sf),
         food_in_storage: getVal(survey, mapping.survey_object.fields.food_in_storage) === true || getVal(survey, mapping.survey_object.fields.food_in_storage) === "Yes",
         address_different: getVal(survey, mapping.survey_object.fields.address_different) === true || getVal(survey, mapping.survey_object.fields.address_different) === "Yes",
-        registers: getVal(survey, mapping.survey_object.fields.registers),
         specialty_registers: getVal(survey, mapping.survey_object.fields.specialty_registers),
         total_pos: getVal(survey, mapping.survey_object.fields.total_pos),
+        exteriors_gas: false,
+        overviews_found: false,
+        checkouts_found: false,
+        wrong_size: false,
         hpi_list: [1,2,3,4,5,6].map(i => ({
           desc: getVal(survey, `${mapping.survey_object.fields.hpi.prefix}${i}${mapping.survey_object.fields.hpi.descSuffix}`),
           units: getVal(survey, `${mapping.survey_object.fields.hpi.prefix}${i}${mapping.survey_object.fields.hpi.unitsSuffix}`)
@@ -151,10 +154,10 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
           const itemCountField = `${cat.countPrefix}${i}__c`;
           const itemFFRField = `${cat.ffrPrefix}${i}__c`;
           
-          const itemName = inventory[itemNameField];
+          const itemName = (inventory as any)[itemNameField];
           console.log(`DEBUG: Checking Category[${catKey}] Field[${itemNameField}]:`, itemName);
           if (itemName && itemName !== 'None' && itemName !== '') {
-            const isFFRChecked = !!inventory[itemFFRField];
+            const isFFRChecked = !!(inventory as any)[itemFFRField];
             const lowerItem = itemName.toLowerCase();
             
             const isMandatoryFFR = lowerItem.includes('eggs') || 
@@ -170,7 +173,7 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
             foodResults.push({
               category: cat.label,
               item: itemName,
-              expected: inventory[itemCountField] || 'Not Set',
+              expected: (inventory as any)[itemCountField] || 'Not Set',
               actual_found: "Pending AI Scan",
               ffr: isFFRChecked,
               should_be_ffr: isMandatoryFFR,
@@ -329,7 +332,10 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
   }, [instanceUrl, bearerToken]);
 
   const runAiAnalysis = useCallback(async () => {
-    if (!validationLog || !bearerToken || !activeIds) return;
+    if (!validationLog || !bearerToken || !activeIds) {
+      setError("Cannot run AI analysis: Store data not loaded.");
+      return;
+    }
 
     setIsAiRunning(true);
     setAiProgress(10);
@@ -515,7 +521,6 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
       const usedAiIndices = new Set<number>();
       const updatedInventory = validationLog.results.food_inventory.map(item => {
         const itemLower = item.item.toLowerCase();
-        const catLower = item.category.toLowerCase();
         
         // Find match in AI findings that hasn't been used yet
         // 1. Try Specific Name Match first
@@ -597,7 +602,31 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
         return { ...item, ai_match_name: null, ai_ffr_found: false, match: false, source_photo_title: null };
       });
 
-      const hasFFRIssues = updatedInventory.some(item => item.should_be_ffr && !item.ffr);
+      // Surface items found by AI but not reported by the store reviewer
+      const missedByReviewer = aiInventory
+        .filter((f: any, idx: number) => !usedAiIndices.has(idx))
+        .map((f: any) => {
+          const photoIndex = typeof f.source_photo === 'number' ? f.source_photo : parseInt(f.source_photo);
+          const photo = inventoryPhotos[photoIndex];
+          return {
+            category: f.category || "Unknown",
+            item: "Missed by Reviewer",
+            expected: "0",
+            actual_found: f.count,
+            ffr: false,
+            should_be_ffr: f.ffr_found,
+            match: false,
+            ai_match_name: f.item,
+            ai_confidence: f.confidence,
+            ai_ffr_found: f.ffr_found,
+            source_photo: photo?.Base64,
+            source_photo_title: photo?.Title || `Photo ${photoIndex}`,
+            reviewer_missed: true
+          };
+        });
+
+      updatedInventory.push(...missedByReviewer);
+      
       const isSketchPass = !criticalFindings?.sketch || criticalFindings.sketch.hpi_stars_found;
       const isConsentPass = !criticalFindings?.consent || criticalFindings.consent.all_six_filled;
 
