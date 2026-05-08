@@ -77,22 +77,22 @@ export const FoodInventoryDashboard: React.FC<DashboardProps> = ({ report }) => 
       <CategoryTable 
         title="🧀 Dairy & Substitutes" 
         items={report.food_inventory.dairy_and_substitutes} 
-        exceeds={report.metadata.exceeds_dairy_limit}
+        exceeds={!!report.metadata.exceeds_dairy_limit}
       />
       <CategoryTable 
         title="🥩 Meats, Poultry, Fish" 
         items={report.food_inventory.meats_poultry_fish} 
-        exceeds={report.metadata.exceeds_meat_limit}
+        exceeds={!!report.metadata.exceeds_meat_limit}
       />
       <CategoryTable 
         title="🍞 Breads, Grains, Cereals" 
         items={report.food_inventory.breads_grains_cereals} 
-        exceeds={report.metadata.exceeds_bread_limit}
+        exceeds={!!report.metadata.exceeds_bread_limit}
       />
       <CategoryTable 
         title="🍎 Fruits & Vegetables" 
         items={report.food_inventory.fruits_and_vegetables} 
-        exceeds={report.metadata.exceeds_produce_limit}
+        exceeds={!!report.metadata.exceeds_produce_limit}
       />
 
     </div>

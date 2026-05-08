@@ -9,8 +9,8 @@ interface QCReportAuditProps {
 export const QCReportAudit: React.FC<QCReportAuditProps> = ({ report, onUpdateReport }) => {
   const [activeSection, setActiveSection] = useState<'critical' | 'food' | 'comments' | 'corrections'>('critical');
   const [corrections, setCorrections] = useState<Record<string, number>>({});
-  const [, setFormCorrection] = useState('');
-  const [, setSketchNotes] = useState('');
+  const [formCorrection, setFormCorrection] = useState('');
+  const [sketchNotes, setSketchNotes] = useState('');
 
   const updateChecklistItem = (id: string, status: ValidationStatus) => {
     if (!report.audit_result) return;
@@ -33,19 +33,7 @@ export const QCReportAudit: React.FC<QCReportAuditProps> = ({ report, onUpdateRe
     // In a real app, this would update the report state
   };
 
-  const renderStatusBadge = (status: ValidationStatus) => {
-    const colors = {
-      Pending: 'var(--text-secondary)',
-      Pass: 'var(--accent-green)',
-      Fail: 'var(--accent-red)',
-      Corrected: 'var(--accent-amber)'
-    };
-    return (
-      <span className="status-badge" style={{ color: colors[status], borderColor: colors[status] }}>
-        {status}
-      </span>
-    );
-  };
+
 
   return (
     <div className="qc-audit-container">

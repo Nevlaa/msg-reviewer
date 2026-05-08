@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { SalesforceConnector } from './components/SalesforceConnector';
 import { StoreReviewerWorkstation } from './components/StoreReviewerWorkstation';
 import './App.css';

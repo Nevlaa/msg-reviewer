@@ -7,7 +7,7 @@ interface QCDocFormProps {
   isAiRunning: boolean;
 }
 
-export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate, isAiRunning }) => {
+export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate }) => {
   const renderCheckWithEvidence = (section: string, field: string, label: string) => {
     // Correctly path to compliance_checks for evidence and rules
     const targetSection = (section === 'evidence' || section === 'rules') 

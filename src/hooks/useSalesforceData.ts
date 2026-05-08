@@ -604,7 +604,7 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
 
       // Surface items found by AI but not reported by the store reviewer
       const missedByReviewer = aiInventory
-        .filter((f: any, idx: number) => !usedAiIndices.has(idx))
+        .filter((_: any, idx: number) => !usedAiIndices.has(idx))
         .map((f: any) => {
           const photoIndex = typeof f.source_photo === 'number' ? f.source_photo : parseInt(f.source_photo);
           const photo = inventoryPhotos[photoIndex];

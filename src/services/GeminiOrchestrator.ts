@@ -1,6 +1,8 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { SNAPScanReport } from "../types";
 
+export type ValidationMode = 'reviewer' | 'qc';
+
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(API_KEY);
 
@@ -9,7 +11,8 @@ const genAI = new GoogleGenerativeAI(API_KEY);
  * Standardized on gemini-1.5-flash for reliability.
  */
 export const processBatchWithGemini = async (
-  files: File[]
+  files: File[],
+  mode: ValidationMode = 'reviewer'
 ): Promise<SNAPScanReport> => {
   const model = genAI.getGenerativeModel({ 
     model: "gemini-1.5-flash",
@@ -29,8 +32,12 @@ export const processBatchWithGemini = async (
   );
 
   try {
+    const prompt = mode === 'qc' 
+      ? "Perform a Senior Level 3 QC Audit on these store photos. Return a SNAP compliance report in JSON."
+      : "Analyze these store photos as a Store Reviewer. Return a SNAP compliance report in JSON.";
+
     const result = await model.generateContent([
-      "Analyze these store photos and return a SNAP compliance report in JSON.",
+      prompt,
       ...imageParts
     ]);
     
