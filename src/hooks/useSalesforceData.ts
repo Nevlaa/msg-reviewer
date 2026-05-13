@@ -230,8 +230,8 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
       }
 
       if (locationParam) {
-        // Use the Gemini key (assumed to be a Google Cloud key with Maps enabled)
-        streetViewUrl = `https://maps.googleapis.com/maps/api/streetview?size=600x400&location=${locationParam}&key=${import.meta.env.VITE_GEMINI_API_KEY}`;
+        // Use standard Google Maps embed which doesn't require a billed Street View API key
+        streetViewUrl = `https://maps.google.com/maps?q=${locationParam}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
       }
 
       // Pre-load key photo Base64s for immediate display
@@ -738,7 +738,7 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
             ...validationLog.results.location_verification,
             ai_architectural_match: criticalFindings?.exterior?.architectural_match || "N/A",
             geospatial_confidence: criticalFindings?.exterior?.confidence || 0,
-            source_photo: criticalPhotos.exterior?.Base64
+            source_photo: criticalPhotos.exterior?.Base64 || inventoryPhotos[parsePhotoIndex(aiEvidence.exterior?.source_photo)]?.Base64
           },
           compliance_checks: {
             ...validationLog.results.compliance_checks,

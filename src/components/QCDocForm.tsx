@@ -70,9 +70,16 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate }) => {
         <div className="geospatial-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', padding: '1rem' }}>
           <div className="geo-side">
             <div className="tiny-text mb-5">GOOGLE STREET VIEW (REFERENCE)</div>
-            <div className="geo-img-placeholder">
+            <div className="geo-img-placeholder" style={{ height: '250px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {data?.results.location_verification?.street_view_image ? (
-                <img src={data.results.location_verification.street_view_image} alt="Street View" />
+                <iframe 
+                  width="100%" 
+                  height="100%" 
+                  frameBorder="0" 
+                  style={{ border: 0 }} 
+                  src={data.results.location_verification.street_view_image} 
+                  allowFullScreen 
+                />
               ) : (
                 <span>No coordinates found in Maps link</span>
               )}
@@ -80,12 +87,12 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate }) => {
           </div>
           <div className="geo-side">
             <div className="tiny-text mb-5">AGENT EXTERIOR PHOTO (EVIDENCE)</div>
-            <div className="geo-img-placeholder">
+            <div className="geo-img-placeholder" style={{ height: '250px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f1f5f9' }}>
               {data?.results.location_verification?.source_photo ? (
-                <img src={data.results.location_verification.source_photo} alt="AI Exterior Match" />
+                <img src={data.results.location_verification.source_photo} alt="AI Exterior Match" style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} />
               ) : (
                 data?.results.location_verification?.exterior_photo ? (
-                   <img src={data.results.location_verification.exterior_photo} alt="Record Exterior" />
+                   <img src={data.results.location_verification.exterior_photo} alt="Record Exterior" style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} />
                 ) : (
                   <span>No exterior photo found</span>
                 )

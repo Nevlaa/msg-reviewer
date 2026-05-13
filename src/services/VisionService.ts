@@ -104,6 +104,7 @@ export class VisionService {
     - IMAGE INTEGRITY: Do NOT satisfy the entire list from a single image (e.g., Image 100009860) unless the items are clearly present. If an item is expected as Shelf Stable (FFR: false) and you only see a freezer, return count 0 for that item.
     
     STEP 2: STAPLE AREA EVIDENCE
+    - "exterior": Photo of the OUTSIDE of the store building
     - "jerky": Jerky/Meat sticks
     - "canned": Canned meat/veg/soup
     - "chips": ACCESSORY snack bags
@@ -121,6 +122,7 @@ export class VisionService {
         { "item": "Variety Name", "category": "Category", "count": "number or 20+", "ffr_found": boolean, "source_photo": <integer>, "confidence": 0.9 }
       ],
       "evidence_found": {
+        "exterior": { "found": boolean, "source_photo": <integer> },
         "jerky": { "found": boolean, "source_photo": <integer> },
         "canned": { "found": boolean, "source_photo": <integer> },
         "chips": { "found": boolean, "source_photo": <integer> },
