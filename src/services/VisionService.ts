@@ -98,10 +98,11 @@ export class VisionService {
 
     - TASK A: For EVERY variety in the reviewer's list above, find it and count the units in the images.
     - TASK B: Identify and count ANY OTHER staple food varieties visible in the images that are NOT on the list above. Add them to your findings.
-    - AGGREGATION EXAMPLE: If you see 5 cans of Tuna and 2 bags of Frozen Tuna, the variety "Tuna" has a count of 7 and ffr_found=true.
+    - CROSS-IMAGE AGGREGATION (CRITICAL): Items of the same variety are often spread across MULTIPLE images! You MUST look through ALL provided images before finalizing a count. Do NOT stop when you find an item in one image. If "Buns/Rolls" are in Image 5 (count: 4) and also in Image 12 (count: 6), aggregate them to count: 10!
+    - FFR AGGREGATION: If you see 5 cans of Tuna (Shelf) and 2 bags of Frozen Tuna, the variety "Tuna" has a count of 7 and ffr_found=true.
     - DEPTH ASSUMPTION: If items are in rows or stacked, assume depth. Use "10+" or "20+" if the row/stack looks deep.
     - VOLUME CAP: Use "20+" for 20+ units.
-    - IMAGE INTEGRITY: Do NOT satisfy the entire list from a single image (e.g., Image 100009860) unless the items are clearly present. If an item is expected as Shelf Stable (FFR: false) and you only see a freezer, return count 0 for that item.
+    - IMAGE INTEGRITY: Do NOT satisfy the entire list from a single image unless the items are clearly present. If an item is expected as Shelf Stable (FFR: false) and you only see a freezer, return count 0 for that item.
     
     STEP 2: STAPLE AREA EVIDENCE
     - "exterior": Photo of the OUTSIDE of the store building
@@ -114,7 +115,8 @@ export class VisionService {
     - "pastry": Bread/Pastries/Baked goods
 
     STEP 3: SOURCE MAPPING
-    - SOURCE PHOTO: You MUST provide the exact integer from the 'Image Index: X' label that corresponds to the image where the item/evidence is clearly visible. DO NOT guess. If you cannot find it, return null for source_photo.
+    - SOURCE PHOTO: You MUST provide the exact integer from the 'Image Index: X' label that corresponds to the image where the item/evidence is clearly visible. DO NOT guess.
+    - PRIMARY IMAGE: If an item count was aggregated across multiple images, return the 'Image Index' of the clearest or largest grouping for 'source_photo', but the 'count' MUST reflect the TOTAL across ALL images. If you cannot find it at all, return null for source_photo.
 
     Return STRICT JSON:
     {
