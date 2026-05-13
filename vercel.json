@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/services/:path*",
+      "destination": "https://manhattanstrategygroupgovcloud.my.salesforce.com/services/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
