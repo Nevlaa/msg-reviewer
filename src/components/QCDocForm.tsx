@@ -8,6 +8,27 @@ interface QCDocFormProps {
 }
 
 export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate }) => {
+  const openImage = (e: React.MouseEvent | null, base64Str: string) => {
+    if (e) e.stopPropagation();
+    if (!base64Str) return;
+    if (base64Str.startsWith('http')) {
+      window.open(base64Str, '_blank');
+      return;
+    }
+    const win = window.open('', '_blank');
+    if (win) {
+      win.document.write(`
+        <html>
+          <head><title>Evidence Photo</title></head>
+          <body style="margin: 0; background: #0f172a; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+            <img src="${base64Str}" style="max-width: 100%; max-height: 100vh; object-fit: contain;" />
+          </body>
+        </html>
+      `);
+      win.document.close();
+    }
+  };
+
   const renderCheckWithEvidence = (section: string, field: string, label: string) => {
     // Correctly path to compliance_checks for evidence and rules
     const targetSection = (section === 'evidence' || section === 'rules') 
@@ -27,7 +48,7 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate }) => {
         <span>{label}</span>
         <div className="flex-gap-small">
           {sourcePhoto && (
-            <div className="evidence-preview-tiny" onClick={(e) => { e.stopPropagation(); window.open(sourcePhoto, '_blank'); }}>
+            <div className="evidence-preview-tiny" onClick={(e) => openImage(e, sourcePhoto)}>
               <img src={sourcePhoto} alt="Evidence" title="Click to view full AI evidence" />
             </div>
           )}
@@ -304,7 +325,7 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate }) => {
                         <td style={{ padding: '5px 6px' }}>
                           {item.source_photo ? (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <div className="evidence-preview-tiny" onClick={() => window.open(item.source_photo, '_blank')}>
+                              <div className="evidence-preview-tiny" onClick={(e) => openImage(e, item.source_photo)}>
                                 <img src={item.source_photo} alt="Source" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                               </div>
                               <span style={{ fontSize: '0.55rem', color: '#64748b', fontFamily: 'monospace' }}>{item.source_photo_title || '—'}</span>
@@ -359,7 +380,7 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate }) => {
           <div className="qc-title">📸 AI SWEEP: INVENTORY VERIFICATION GALLERY ({data.results.scanned_photos.length} photos scanned)</div>
           <div className="evidence-gallery">
             {data.results.scanned_photos.map((src: string, i: number) => (
-              <div key={i} className="gallery-item" onClick={() => window.open(src, '_blank')}>
+              <div key={i} className="gallery-item" onClick={(e) => openImage(e, src)}>
                 <img src={src} alt={`Sweep ${i}`} />
                 <div className="gallery-label"># {i + 1}</div>
               </div>

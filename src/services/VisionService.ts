@@ -112,19 +112,22 @@ export class VisionService {
     - "coolers": Any glass-door fridge/freezer
     - "pastry": Bread/Pastries/Baked goods
 
+    STEP 3: SOURCE MAPPING
+    - SOURCE PHOTO: You MUST provide the exact integer from the 'Image Index: X' label that corresponds to the image where the item/evidence is clearly visible. DO NOT guess. If you cannot find it, return null for source_photo.
+
     Return STRICT JSON:
     {
       "inventory": [
-        { "item": "Variety Name", "category": "Category", "count": "number or 20+", "ffr_found": boolean, "source_photo": 0, "confidence": 0.9 }
+        { "item": "Variety Name", "category": "Category", "count": "number or 20+", "ffr_found": boolean, "source_photo": <integer>, "confidence": 0.9 }
       ],
       "evidence_found": {
-        "jerky": { "found": boolean, "source_photo": 0 },
-        "canned": { "found": boolean, "source_photo": 0 },
-        "chips": { "found": boolean, "source_photo": 0 },
-        "milk_eggs": { "found": boolean, "source_photo": 0 },
-        "juice": { "found": boolean, "source_photo": 0 },
-        "coolers": { "found": boolean, "source_photo": 0 },
-        "pastry": { "found": boolean, "source_photo": 0 }
+        "jerky": { "found": boolean, "source_photo": <integer> },
+        "canned": { "found": boolean, "source_photo": <integer> },
+        "chips": { "found": boolean, "source_photo": <integer> },
+        "milk_eggs": { "found": boolean, "source_photo": <integer> },
+        "juice": { "found": boolean, "source_photo": <integer> },
+        "coolers": { "found": boolean, "source_photo": <integer> },
+        "pastry": { "found": boolean, "source_photo": <integer> }
       },
       "quality_audit": { "status": "Good", "details": "string" }
     }`;

@@ -527,6 +527,15 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
       const aiEvidence = inventoryFindings.evidence_found || {};
       const aiLayout = criticalFindings?.layout || {};
 
+      const parsePhotoIndex = (val: any) => {
+        if (typeof val === 'number') return val;
+        if (typeof val === 'string') {
+          const match = val.match(/\d+/);
+          if (match) return parseInt(match[0], 10);
+        }
+        return -1;
+      };
+
       const usedAiIndices = new Set<number>();
       const updatedInventory = validationLog.results.food_inventory.map(item => {
         const itemLower = item.item.toLowerCase();
@@ -594,8 +603,8 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
                         (diff <= 2);
 
         if (found) {
-          const photoIndex = typeof found.source_photo === 'number' ? found.source_photo : parseInt(found.source_photo);
-          const photo = inventoryPhotos[photoIndex];
+          const photoIndex = parsePhotoIndex(found.source_photo);
+          const photo = photoIndex >= 0 ? inventoryPhotos[photoIndex] : undefined;
           return { 
             ...item, 
             actual_found: found.count,
@@ -615,8 +624,8 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
       const missedByReviewer = aiInventory
         .filter((_: any, idx: number) => !usedAiIndices.has(idx))
         .map((f: any) => {
-          const photoIndex = typeof f.source_photo === 'number' ? f.source_photo : parseInt(f.source_photo);
-          const photo = inventoryPhotos[photoIndex];
+          const photoIndex = parsePhotoIndex(f.source_photo);
+          const photo = photoIndex >= 0 ? inventoryPhotos[photoIndex] : undefined;
           return {
             category: f.category || "Unknown",
             item: "Missed by Reviewer",
@@ -750,13 +759,13 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
               coolers: aiEvidence.coolers?.found,
               pastry: aiEvidence.pastry?.found,
               sources: {
-                jerky: { source_photo: inventoryPhotos[aiEvidence.jerky?.source_photo]?.Base64 },
-                chips: { source_photo: inventoryPhotos[aiEvidence.chips?.source_photo]?.Base64 },
-                milk: { source_photo: inventoryPhotos[aiEvidence.milk_eggs?.source_photo]?.Base64 },
-                canned: { source_photo: inventoryPhotos[aiEvidence.canned?.source_photo]?.Base64 },
-                juice: { source_photo: inventoryPhotos[aiEvidence.juice?.source_photo]?.Base64 },
-                coolers: { source_photo: inventoryPhotos[aiEvidence.coolers?.source_photo]?.Base64 },
-                pastry: { source_photo: inventoryPhotos[aiEvidence.pastry?.source_photo]?.Base64 }
+                jerky: { source_photo: inventoryPhotos[parsePhotoIndex(aiEvidence.jerky?.source_photo)]?.Base64 },
+                chips: { source_photo: inventoryPhotos[parsePhotoIndex(aiEvidence.chips?.source_photo)]?.Base64 },
+                milk: { source_photo: inventoryPhotos[parsePhotoIndex(aiEvidence.milk_eggs?.source_photo)]?.Base64 },
+                canned: { source_photo: inventoryPhotos[parsePhotoIndex(aiEvidence.canned?.source_photo)]?.Base64 },
+                juice: { source_photo: inventoryPhotos[parsePhotoIndex(aiEvidence.juice?.source_photo)]?.Base64 },
+                coolers: { source_photo: inventoryPhotos[parsePhotoIndex(aiEvidence.coolers?.source_photo)]?.Base64 },
+                pastry: { source_photo: inventoryPhotos[parsePhotoIndex(aiEvidence.pastry?.source_photo)]?.Base64 }
               }
             },
             layout_verification: {
