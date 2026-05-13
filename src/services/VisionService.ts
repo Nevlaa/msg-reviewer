@@ -48,12 +48,16 @@ export class VisionService {
       }
     `;
 
-    const parts = [prompt];
-    if (images.consent) parts.push(images.consent);
-    if (images.sketch) parts.push(images.sketch);
-    if (images.exterior) parts.push(images.exterior);
-    if (images.overviews) parts.push(...images.overviews);
-    if (images.checkouts) parts.push(...images.checkouts);
+    const parts: any[] = [prompt];
+    if (images.consent) { parts.push("Image: Consent Form"); parts.push(images.consent); }
+    if (images.sketch) { parts.push("Image: Sketch"); parts.push(images.sketch); }
+    if (images.exterior) { parts.push("Image: Exterior"); parts.push(images.exterior); }
+    if (images.overviews && images.overviews.length > 0) {
+      images.overviews.forEach((p: any, i: number) => { parts.push(`Image: Overview ${i}`); parts.push(p); });
+    }
+    if (images.checkouts && images.checkouts.length > 0) {
+      images.checkouts.forEach((p: any, i: number) => { parts.push(`Image: Checkout ${i}`); parts.push(p); });
+    }
 
     try {
       const result = await this.model.generateContent(parts);
@@ -126,7 +130,13 @@ export class VisionService {
     }`;
 
     try {
-      const result = await this.model.generateContent([prompt, ...imageParts]);
+      const parts: any[] = [prompt];
+      imageParts.forEach((part, index) => {
+        parts.push(`Image Index: ${index}`);
+        parts.push(part);
+      });
+
+      const result = await this.model.generateContent(parts);
       const response = await result.response;
       let text = response.text().trim();
 

@@ -220,9 +220,18 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
         }
       }
 
+      let locationParam = "";
       if (lat && lng) {
+        locationParam = `${lat},${lng}`;
+      } else if (surveyAddress) {
+        locationParam = encodeURIComponent(surveyAddress);
+      } else if (usdaAddress) {
+        locationParam = encodeURIComponent(usdaAddress);
+      }
+
+      if (locationParam) {
         // Use the Gemini key (assumed to be a Google Cloud key with Maps enabled)
-        streetViewUrl = `https://maps.googleapis.com/maps/api/streetview?size=600x400&location=${lat},${lng}&key=${import.meta.env.VITE_GEMINI_API_KEY}`;
+        streetViewUrl = `https://maps.googleapis.com/maps/api/streetview?size=600x400&location=${locationParam}&key=${import.meta.env.VITE_GEMINI_API_KEY}`;
       }
 
       // Pre-load key photo Base64s for immediate display
@@ -640,7 +649,7 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
                          15 - (missingEvidence.length * 2);
 
       const ffrMismatches = updatedInventory
-        .filter(item => item.ai_ffr_found && !item.ffr)
+        .filter(item => item.ai_ffr_found && !item.ffr && !item.reviewer_missed)
         .map(item => item.item);
 
       const countScore = Math.max(1, 15 - (ffrMismatches.length * 2));
