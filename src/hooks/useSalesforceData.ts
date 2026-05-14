@@ -702,15 +702,17 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
         });
 
         // The audit passes if the AI confirms at least the required number of varieties
+        // User requested: large store estimate allows a 2-item margin of error
+        const minPassing = requiredVarieties > 3 ? requiredVarieties - 2 : 3;
         const totalVarieties = Math.max(sfVarieties.length, aiVarietiesForCat.length);
-        const passed = totalVarieties >= requiredVarieties;
+        const passed = totalVarieties >= minPassing;
 
         const aiItemNames = aiVarietiesForCat.map((f: any) => f.item).slice(0, 5).join(', ');
         return {
           status: passed,
           reasoning: passed 
-            ? `✅ ${totalVarieties} varieties confirmed (Req: ${requiredVarieties}). AI found: ${aiItemNames || 'N/A'}.` 
-            : `❌ Only ${totalVarieties} varieties found (Req: ${requiredVarieties}). SF items: ${sfVarieties.length}, AI items: ${aiVarietiesForCat.length}.`
+            ? `✅ ${totalVarieties} varieties confirmed (Req: ${requiredVarieties}${requiredVarieties > 3 ? ', Margin: ±2' : ''}). AI found: ${aiItemNames || 'N/A'}.` 
+            : `❌ Only ${totalVarieties} varieties found (Req: ${requiredVarieties}${requiredVarieties > 3 ? ', Margin: ±2' : ''}). SF items: ${sfVarieties.length}, AI items: ${aiVarietiesForCat.length}.`
         };
       };
 
