@@ -35,7 +35,7 @@ export class VisionService {
       
       DOCUMENTS: Verify Consent Form signature and Sketch landmarks (Entrance, Checkouts, HPI Stars).
       ARCHITECTURE: Compare Exterior photo (showing the front/entrance of the building) against Street View reference.
-      LAYOUT: Confirm Overviews and Checkouts provide clear coverage of the store.
+      LAYOUT: Confirm Overviews and Checkouts provide clear coverage of the store. A "Checkout" area includes cash registers, point-of-sale systems, glass display counters, or transaction areas.
       QUALITY: Flag if any critical photos are "Wrong size", Blurry, or Poorly framed.
       
       Return JSON:
@@ -84,7 +84,7 @@ export class VisionService {
     - JERKY: Jerky MUST be categorized as "Beef/Veal", "Pork", or "Chicken" based on its 1st or 2nd ingredient. NEVER output "Jerky" as the variety name.
     - GRAIN FORMATS: Bread/Cereals/Wheat processed foods can be Shelf-Stable (loaves, dry pasta, boxed cereal) OR Frozen/Refrigerated (FFR) (e.g., frozen waffles, frozen pizza crust, refrigerated tortillas, refrigerated pasta). Look in BOTH areas.
     - PRODUCE FORMATS: Fruit/Veg can be Fresh, Canned, Frozen (FFR), or 100% Juice.
-    - JUICE RULE: 100% Juice counts. If you see fruit juices or drinks (like Aloe King, fruit nectars) that represent fruits (e.g., Peaches, Strawberries, Apples, Oranges), count them as those respective Fruit varieties.
+    - JUICE RULE: 100% Juice counts. If you see fruit juices or drinks (like Aloe King, fruit nectars) that represent fruits (e.g., Peaches, Strawberries, Apples, Oranges), count them as those respective Fruit varieties. DO NOT append the word "Juice" or "100%" to the variety name! Output EXACTLY "Apples", "Oranges", "Peaches", etc. NEVER output "Juice - Apple".
     - TOMATOES: Includes fresh, chip salsa, canned tomatoes, tomato paste, or sauce IF tomato is 1st or 2nd ingredient.
     - DISAMBIGUATION (CRITICAL): Do NOT confuse round fruits. Apples are not Oranges. Bananas are long and yellow. Do not mark Bananas as Apples. Look closely.
     - FFR INHERITANCE: If a variety contains both Canned and Frozen items, set ffr_found=true for the entire variety.
