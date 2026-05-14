@@ -90,11 +90,20 @@ export class VisionService {
     - TAXONOMY ISOLATION: Do NOT cross-match categories. "Eggs" are NOT "Chicken". "Tuna" is NOT "Salmon".
     - EXCLUSIONS: Do NOT count Accessory Foods (Chips, Candy, Soda) or Hot Prepared Foods.
     
+    VISUAL DETECTION GUIDE (DENSE SHELVES):
+    - DENSE SCANNING: Shelves may be packed tightly. Scan row-by-row, zooming into text, shapes, and logos.
+    - RAMEN/PASTA: Look for stacked square packets (e.g., Top Ramen, Maruchan) or styrofoam noodle cups.
+    - OATS: Look for cylindrical cardboard canisters (e.g., Quaker Oats).
+    - BAKING MIX: Look for small cardboard boxes (e.g., Jiffy mix) near baking supplies.
+    - CEREAL: Can be large boxes OR small individual plastic cups (e.g., Frosted Flakes cups, Froot Loops cups).
+    - CANNED GOODS: Look for cylindrical cans. Flat round cans are often Tuna. Oval tins are often Sardines. Standard cans may be Vegetables or Fruit. READ THE LABELS (e.g., Del Monte).
+    - PICKLES/RELISH: Look for glass jars with greenish contents.
+
     CATEGORIES:
-    1. "Bread/Cereals": Rice, Oats, Bread, Tortillas, Cereals, Pasta, Ramen.
+    1. "Bread/Cereals": Rice, Oats, Bread, Tortillas, Cereals, Pasta, Ramen, Baking Mix.
     2. "Dairy": Milk - Dairy (Aggregated), Yogurt (Aggregated), Cheese, Butter, Eggs.
     3. "Meat/Poultry/Fish": Beef, Chicken, Pork, Salmon, Tuna, Sardines, Jerky, SPAM.
-    4. "Fruit/Veg": Apples (or Apple Juice), Bananas, Oranges (or Orange Juice), Tomatoes (or Salsa/Paste), Potatoes, Canned Veg.
+    4. "Fruit/Veg": Apples (or Apple Juice), Bananas, Oranges (or Orange Juice), Tomatoes (or Salsa/Paste), Potatoes, Canned Veg, Pickles.
 
     STEP 1: INVENTORY & UNIT COUNTING (CRITICAL)
     - You must perform a COMPREHENSIVE SCAN of the images and identify ALL staple food varieties present.
