@@ -78,18 +78,23 @@ export class VisionService {
     const prompt = `You are a SENIOR LEVEL 3 QC AUDITOR performing a USDA SNAP 3x3 or 10/10/10/14 VARIETY COUNT audit.
     
     CRITICAL TAXONOMY RULES:
-    - CATEGORIZATION: Use the "First Ingredient Rule" for mixed foods.
-    - THE CONSOLIDATION RULE: Aggregate different storage types (Canned vs. Frozen) and flavors/fat-content (Whole vs. 2%) of the same product type into a SINGLE variety count. 
+    - CATEGORIZATION: Use the "First Ingredient Rule" for mixed foods (must be 1st or 2nd ingredient).
+    - THE CONSOLIDATION RULE: Aggregate different storage types (Canned vs. Frozen) into a SINGLE variety count. 
+    - MEAT FORMATS: Tuna, Sardines, Beef, Pork, and Chicken can be Canned (Shelf), Fresh/Frozen (FFR), or Jerky/Meat Sticks. Look for ALL formats.
+    - JERKY: Jerky counts as Beef, Pork, or Chicken IF it is the 1st or 2nd ingredient.
+    - PRODUCE FORMATS: Fruit/Veg can be Fresh, Canned, Frozen (FFR), or 100% Juice.
+    - JUICE RULE: 100% Juice counts (e.g., Apple Juice counts as Apples, Orange Juice as Oranges). Juice "cocktails" or drinks do NOT count.
+    - TOMATOES: Includes fresh, chip salsa, canned tomatoes, tomato paste, or sauce IF tomato is 1st or 2nd ingredient.
+    - DISAMBIGUATION (CRITICAL): Do NOT confuse round fruits. Apples are not Oranges. Bananas are long and yellow. Do not mark Bananas as Apples. Look closely.
     - FFR INHERITANCE: If a variety contains both Canned and Frozen items, set ffr_found=true for the entire variety.
-    - FFR ALIGNMENT RULE: You MUST respect the temperature status. If an item is NOT marked as FFR in the provided list, do NOT match it to items seen inside freezers or coolers. 
     - TAXONOMY ISOLATION: Do NOT cross-match categories. "Eggs" are NOT "Chicken". "Tuna" is NOT "Salmon".
     - EXCLUSIONS: Do NOT count Accessory Foods (Chips, Candy, Soda) or Hot Prepared Foods.
     
     CATEGORIES:
     1. "Bread/Cereals": Rice, Oats, Bread, Tortillas, Cereals, Pasta, Ramen.
     2. "Dairy": Milk - Dairy (Aggregated), Yogurt (Aggregated), Cheese, Butter, Eggs.
-    3. "Meat/Poultry/Fish": Beef, Chicken, Pork, Salmon, Tuna, Jerky, SPAM.
-    4. "Fruit/Veg": Apples, Bananas, Tomatoes, Potatoes, 100% Juice, Canned Veg.
+    3. "Meat/Poultry/Fish": Beef, Chicken, Pork, Salmon, Tuna, Sardines, Jerky, SPAM.
+    4. "Fruit/Veg": Apples (or Apple Juice), Bananas, Oranges (or Orange Juice), Tomatoes (or Salsa/Paste), Potatoes, Canned Veg.
 
     STEP 1: INVENTORY & UNIT COUNTING (CRITICAL)
     - You must perform a COMPREHENSIVE SCAN of the images and identify ALL staple food varieties present.
