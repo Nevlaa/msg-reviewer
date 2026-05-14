@@ -140,9 +140,6 @@ export class VisionService {
 
     Return STRICT JSON:
     {
-      "inventory": [
-        { "item": "Variety Name", "category": "Category", "count": "number or 20+", "ffr_found": boolean, "source_photo": <integer>, "confidence": 0.9 }
-      ],
       "evidence_found": {
         "exterior": { "found": boolean, "source_photo": <integer> },
         "jerky": { "found": boolean, "source_photo": <integer> },
@@ -153,7 +150,10 @@ export class VisionService {
         "coolers": { "found": boolean, "source_photo": <integer> },
         "pastry": { "found": boolean, "source_photo": <integer> }
       },
-      "quality_audit": { "status": "Good", "details": "string" }
+      "quality_audit": { "status": "Good", "details": "string" },
+      "inventory": [
+        { "item": "Variety Name", "category": "Category", "count": "number or 20+", "ffr_found": boolean, "source_photo": <integer>, "confidence": 0.9 }
+      ]
     }`;
 
     try {
