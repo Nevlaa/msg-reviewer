@@ -80,7 +80,7 @@ export class VisionService {
     CRITICAL TAXONOMY RULES:
     - CATEGORIZATION: Use the "First Ingredient Rule" for mixed foods (must be 1st or 2nd ingredient).
     - THE CONSOLIDATION RULE: Aggregate different storage types (Canned vs. Frozen) into a SINGLE variety count. 
-    - MEAT FORMATS: Tuna, Sardines, Beef, Pork, and Chicken can be Canned (Shelf), Fresh/Frozen (FFR), or Jerky/Meat Sticks. Look for ALL formats. SPAM, Armour Treet, and Vienna Sausages count as Pork, Beef, or Chicken.
+    - MEAT FORMATS: Tuna, Sardines, Beef, Pork, and Chicken can be Canned (Shelf), Fresh/Frozen (FFR), or Jerky/Meat Sticks. Look for ALL formats. SPAM, Armour Treet, Vienna Sausages, Hot Dogs, Lunch Meat (Bologna, Ham) MUST count as Pork, Beef, or Chicken.
     - JERKY: Jerky MUST be categorized as "Beef/Veal", "Pork", or "Chicken" based on its 1st or 2nd ingredient. NEVER output "Jerky" as the variety name.
     - GRAIN FORMATS: Bread/Cereals/Wheat processed foods can be Shelf-Stable (loaves, dry pasta, boxed cereal) OR Frozen/Refrigerated (FFR) (e.g., frozen waffles, frozen pizza crust, refrigerated tortillas, refrigerated pasta). Look in BOTH areas.
     - PRODUCE FORMATS: Fruit/Veg can be Fresh, Canned, Frozen (FFR), or 100% Juice.
