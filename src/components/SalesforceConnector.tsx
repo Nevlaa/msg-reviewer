@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useSalesforceData } from '../hooks/useSalesforceData';
 import { QCDocForm } from './QCDocForm';
 import { QCScoringPanel } from './QCScoringPanel';
-import { LocationVerificationPanel } from './LocationVerificationPanel';
 import './QCDocForm.css';
 
 export const SalesforceConnector: React.FC = () => {
@@ -191,10 +190,6 @@ export const SalesforceConnector: React.FC = () => {
         isAiRunning={isAiRunning}
         onUpdate={handleUpdate}
       />
-
-      {validationLog && (
-        <LocationVerificationPanel data={validationLog} />
-      )}
 
       {validationLog && (
         <QCScoringPanel 
