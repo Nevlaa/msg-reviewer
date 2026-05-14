@@ -34,7 +34,7 @@ export class VisionService {
       EXPECTED STORE: ${context.expected_store}
       
       DOCUMENTS: Verify Consent Form signature and Sketch landmarks (Entrance, Checkouts, HPI Stars).
-      ARCHITECTURE: Compare Exterior photo against Street View reference.
+      ARCHITECTURE: Compare Exterior photo (showing the front/entrance of the building) against Street View reference.
       LAYOUT: Confirm Overviews and Checkouts provide clear coverage of the store.
       QUALITY: Flag if any critical photos are "Wrong size", Blurry, or Poorly framed.
       
@@ -126,7 +126,7 @@ export class VisionService {
     - IMAGE INTEGRITY: Do NOT satisfy the entire list from a single image unless the items are clearly present. If an item is expected as Shelf Stable (FFR: false) and you only see a freezer, return count 0 for that item.
     
     STEP 2: STAPLE AREA EVIDENCE
-    - "exterior": Photo of the OUTSIDE of the store building
+    - "exterior": Photo of the OUTSIDE of the store building (showing the front/entrance, parking lot, or storefront signs)
     - "jerky": Jerky/Meat sticks
     - "canned": Canned meat/veg/soup
     - "chips": ACCESSORY snack bags
