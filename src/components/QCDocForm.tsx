@@ -277,12 +277,12 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate }) => {
                     // "Close enough" logic: 
                     // 1. Exact match
                     // 2. Both are high volume (10+ or 20+)
-                    // 3. Within +/- 2 units
+                    // 3. Within +/- 3 units
                     const isCountClose = 
                       item.reviewer_missed ||
                       item.actual_found === item.expected ||
                       (String(item.actual_found || '').includes('+') && String(item.expected || '').includes('+')) ||
-                      Math.abs(aiCountNum - sfCountNum) <= 2;
+                      Math.abs(aiCountNum - sfCountNum) <= 3;
 
                     const hasMatch = item.reviewer_missed || (item.match && item.ai_match_name);
                     

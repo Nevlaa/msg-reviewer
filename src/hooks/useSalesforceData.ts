@@ -573,7 +573,7 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
         const found = matchIdx !== -1 ? aiInventory[matchIdx] : null;
         if (matchIdx !== -1) usedAiIndices.add(matchIdx);
 
-        // Accuracy Buffer Logic: +/- 2 units is a match.
+        // Accuracy Buffer Logic: +/- 3 units is a match.
         // "20+" is treated as 20 for math, but matches any "20+" or "10+" from AI.
         const parseCount = (c: any) => {
           if (!c || c === 'Pending AI Scan') return 0;
@@ -589,7 +589,7 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
         
         // Match if within buffer, or both are high-volume (20+)
         const isMatch = (item.expected === '20+' && (found?.count === '20+' || found?.count === '10+')) || 
-                        (diff <= 2);
+                        (diff <= 3);
 
         if (found) {
           const photoIndex = parsePhotoIndex(found.source_photo);

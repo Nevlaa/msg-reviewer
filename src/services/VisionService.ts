@@ -80,25 +80,26 @@ export class VisionService {
     CRITICAL TAXONOMY RULES:
     - CATEGORIZATION: Use the "First Ingredient Rule" for mixed foods (must be 1st or 2nd ingredient).
     - THE CONSOLIDATION RULE: Aggregate different storage types (Canned vs. Frozen) into a SINGLE variety count. 
-    - MEAT FORMATS: Tuna, Sardines, Beef, Pork, and Chicken can be Canned (Shelf), Fresh/Frozen (FFR), or Jerky/Meat Sticks. Look for ALL formats.
+    - MEAT FORMATS: Tuna, Sardines, Beef, Pork, and Chicken can be Canned (Shelf), Fresh/Frozen (FFR), or Jerky/Meat Sticks. Look for ALL formats. SPAM, Armour Treet, and Vienna Sausages count as Pork, Beef, or Chicken.
     - JERKY: Jerky counts as Beef, Pork, or Chicken IF it is the 1st or 2nd ingredient.
     - GRAIN FORMATS: Bread/Cereals/Wheat processed foods can be Shelf-Stable (loaves, dry pasta, boxed cereal) OR Frozen/Refrigerated (FFR) (e.g., frozen waffles, frozen pizza crust, refrigerated tortillas, refrigerated pasta). Look in BOTH areas.
     - PRODUCE FORMATS: Fruit/Veg can be Fresh, Canned, Frozen (FFR), or 100% Juice.
-    - JUICE RULE: 100% Juice counts (e.g., Apple Juice counts as Apples, Orange Juice as Oranges). Juice "cocktails" or drinks do NOT count.
+    - JUICE RULE: 100% Juice counts. If you see fruit juices or drinks (like Aloe King, fruit nectars) that represent fruits (e.g., Peaches, Strawberries, Apples, Oranges), count them as those respective Fruit varieties.
     - TOMATOES: Includes fresh, chip salsa, canned tomatoes, tomato paste, or sauce IF tomato is 1st or 2nd ingredient.
     - DISAMBIGUATION (CRITICAL): Do NOT confuse round fruits. Apples are not Oranges. Bananas are long and yellow. Do not mark Bananas as Apples. Look closely.
     - FFR INHERITANCE: If a variety contains both Canned and Frozen items, set ffr_found=true for the entire variety.
     - TAXONOMY ISOLATION: Do NOT cross-match categories. "Eggs" are NOT "Chicken". "Tuna" is NOT "Salmon".
     - EXCLUSIONS: Do NOT count Accessory Foods (Chips, Candy, Soda) or Hot Prepared Foods.
     
-    VISUAL DETECTION GUIDE (DENSE SHELVES):
+    VISUAL DETECTION GUIDE (DENSE SHELVES & COOLERS):
     - DENSE SCANNING: Shelves may be packed tightly. Scan row-by-row, zooming into text, shapes, and logos.
     - RAMEN/PASTA: Look for stacked square packets (e.g., Top Ramen, Maruchan) or styrofoam noodle cups.
-    - OATS: Look for cylindrical cardboard canisters (e.g., Quaker Oats).
-    - BAKING MIX: Look for small cardboard boxes (e.g., Jiffy mix) near baking supplies.
+    - RICE & GRAINS: Look for clear or opaque bags of rice stacked on bottom or middle shelves.
+    - BAKING MIX & FLOUR: Look for small cardboard boxes (e.g., Jiffy mix) near baking supplies, or bags of flour.
     - CEREAL: Can be large boxes OR small individual plastic cups (e.g., Frosted Flakes cups, Froot Loops cups).
-    - CANNED GOODS: Look for cylindrical cans. Flat round cans are often Tuna. Oval tins are often Sardines. Standard cans may be Vegetables or Fruit. READ THE LABELS (e.g., Del Monte).
+    - CANNED GOODS: Look for cylindrical cans. Flat round cans are often Tuna. Oval tins are often Sardines. Standard cans may be Vegetables, Fruit, or Meats (like SPAM or Armour Treet). READ THE LABELS.
     - PICKLES/RELISH: Look for glass jars with greenish contents.
+    - COOLER MILKS: Look for protein shakes or milks (e.g., Fairlife, Core Power, Nesquik) in glass coolers and count them as Milk (Dairy).
 
     GLOBAL INGREDIENT INFERENCE (CRITICAL):
     - You cannot see the back of the packages to read the ingredient lists. 
