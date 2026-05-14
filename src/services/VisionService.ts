@@ -1,8 +1,8 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 /**
- * VisionService - Next-Gen Performance Version 2.5.0
- * Using gemini-2.5-flash-lite for ultra-rapid high-volume audits.
+ * VisionService - Next-Gen Performance Version 3.0.0
+ * Using gemini-2.5-pro for maximum accuracy on inventory audits.
  */
 export class VisionService {
   private genAI: GoogleGenerativeAI;
@@ -10,13 +10,13 @@ export class VisionService {
   public isLocked: boolean = false;
 
   constructor(apiKey: string) {
-    console.log("🚀 INITIALIZING NEXT-GEN ENGINE: gemini-2.5-flash-lite");
+    console.log("🚀 INITIALIZING NEXT-GEN ENGINE: gemini-2.5-pro");
     this.genAI = new GoogleGenerativeAI(apiKey);
     this.model = this.genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash-lite",
+      model: "gemini-2.5-pro",
       generationConfig: {
         responseMimeType: "application/json",
-        maxOutputTokens: 8192,
+        maxOutputTokens: 16384,
         temperature: 0.1
       }
     });
