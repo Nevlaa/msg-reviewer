@@ -35,7 +35,9 @@ export class VisionService {
       
       DOCUMENTS: Verify Consent Form signature and Sketch landmarks (Entrance, Checkouts, HPI Stars).
       ARCHITECTURE: Compare Exterior photo (showing the front/entrance of the building) against Street View reference.
-      LAYOUT: Confirm Overviews and Checkouts provide clear coverage of the store. A "Checkout" area includes cash registers, point-of-sale systems, glass display counters, or transaction areas.
+      LAYOUT: Confirm Overviews and Checkouts provide clear coverage of the store.
+        - "Overview" photos are wide-angle snapshots taken from different vantage points inside the store, showing the overall layout: aisles, shelving gondolas, cooler walls, ceiling, floor, and general store depth. They capture the big picture of the store from multiple angles.
+        - "Checkout" photos show the transaction area: cash registers, POS screens, glass display counters, or service counters where customers pay.
       QUALITY: Flag if any critical photos are "Wrong size", Blurry, or Poorly framed.
       
       Return JSON:
