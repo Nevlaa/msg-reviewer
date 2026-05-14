@@ -610,30 +610,8 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
         return { ...item, ai_match_name: null, ai_ffr_found: false, match: false, source_photo_title: null };
       });
 
-      // Surface items found by AI but not reported by the store reviewer
-      const missedByReviewer = aiInventory
-        .filter((_: any, idx: number) => !usedAiIndices.has(idx))
-        .map((f: any) => {
-          const photoIndex = parsePhotoIndex(f.source_photo);
-          const photo = photoIndex >= 0 ? inventoryPhotos[photoIndex] : undefined;
-          return {
-            category: f.category || "Unknown",
-            item: "Missed by Reviewer",
-            expected: "0",
-            actual_found: f.count,
-            ffr: false,
-            should_be_ffr: f.ffr_found,
-            match: false,
-            ai_match_name: f.item,
-            ai_confidence: f.confidence,
-            ai_ffr_found: f.ffr_found,
-            source_photo: photo?.Base64,
-            source_photo_title: photo?.Title || `Photo ${photoIndex}`,
-            reviewer_missed: true
-          };
-        });
-
-      updatedInventory.push(...missedByReviewer);
+      // AI extras are no longer injected into the table.
+      // The table ONLY shows items from the Store Reviewer's inventory.
       
       const isSketchPass = !criticalFindings?.sketch || criticalFindings.sketch.hpi_stars_found;
       const isConsentPass = !criticalFindings?.consent || criticalFindings.consent.all_six_filled;
@@ -709,8 +687,8 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
         });
 
         // The audit passes if the AI confirms at least the required number of varieties
-        // User requested: large store estimate allows a 2-item margin of error
-        const minPassing = requiredVarieties > 3 ? requiredVarieties - 2 : 3;
+        // User requested: large store estimate allows a 3-item margin of error
+        const minPassing = requiredVarieties > 3 ? requiredVarieties - 3 : 3;
         const totalVarieties = sfVarieties.length + aiExtras.length;
         const passed = totalVarieties >= minPassing;
 
@@ -720,8 +698,8 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
         return {
           status: passed,
           reasoning: passed 
-            ? `✅ ${totalVarieties} varieties confirmed (Req: ${requiredVarieties}${requiredVarieties > 3 ? ', Margin: ±2' : ''}). AI found: ${aiItemNames || 'N/A'}.` 
-            : `❌ Only ${totalVarieties} varieties found (Req: ${requiredVarieties}${requiredVarieties > 3 ? ', Margin: ±2' : ''}). SF items: ${sfVarieties.length}, Extra AI items: ${aiExtras.length}.`
+            ? `✅ ${totalVarieties} varieties confirmed (Req: ${requiredVarieties}${requiredVarieties > 3 ? ', Margin: ±3' : ''}). AI found: ${aiItemNames || 'N/A'}.` 
+            : `❌ Only ${totalVarieties} varieties found (Req: ${requiredVarieties}${requiredVarieties > 3 ? ', Margin: ±3' : ''}). SF items: ${sfVarieties.length}, Extra AI items: ${aiExtras.length}.`
         };
       };
 

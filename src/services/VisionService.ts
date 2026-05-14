@@ -113,17 +113,18 @@ export class VisionService {
     4. Fruit/Veg: "Apples", "Bananas", "Oranges", "Tomatoes", "Potatoes", "Onions", "Carrots", "Lettuce", "Corn", "Beans", "Peas", "Cucumbers/Pickles", "Cabbage".
 
     STEP 1: INVENTORY & UNIT COUNTING (CRITICAL)
-    - You must perform a COMPREHENSIVE SCAN of the images and identify ALL staple food varieties present.
+    - You must VERIFY the Store Reviewer's reported inventory list against the images provided.
     - Here is the Store Reviewer's reported list to verify (Item Name | Expected Count | Expected FFR Status):
       ${expectedInventory.map(i => `- ${i.item} (Expected Count: ${i.expected} | Is FFR: ${i.should_be_ffr})`).join("\n      ")}
 
-    - TASK A: For EVERY variety in the reviewer's list above, find it and verify the counts in the images. Use the "Expected Count" as your search anchor—if the reviewer says "20+", look for a large quantity!
-    - TASK B: Identify and count ANY OTHER staple food varieties visible in the images that are NOT on the list above. Add them to your findings.
+    - YOUR ONLY TASK: For EVERY variety in the reviewer's list above, search ALL images to find it and count the visible units. Use the "Expected Count" as your search anchor.
+    - OUTPUT NAMING (CRITICAL): When you find a match, use the EXACT item name from the reviewer's list above as your "item" output. Do NOT rename, rephrase, or append words like "Juice", "Canned", "Fresh", etc. If the reviewer listed "Apples", output "Apples". If the reviewer listed "Beef/Veal", output "Beef/Veal".
     - CROSS-IMAGE AGGREGATION (CRITICAL): Items of the same variety are often spread across MULTIPLE images! You MUST look through ALL provided images before finalizing a count. Do NOT stop when you find an item in one image. If "Buns/Rolls" are in Image 5 (count: 4) and also in Image 12 (count: 6), aggregate them to count: 10!
     - FFR AGGREGATION: If you see 5 cans of Tuna (Shelf) and 2 bags of Frozen Tuna, the variety "Tuna" has a count of 7 and ffr_found=true.
     - DEPTH ASSUMPTION: If items are in rows or stacked, assume depth. Use "10+" or "20+" if the row/stack looks deep.
     - VOLUME CAP: Use "20+" for 20+ units.
     - IMAGE INTEGRITY: Do NOT satisfy the entire list from a single image unless the items are clearly present. If an item is expected as Shelf Stable (FFR: false) and you only see a freezer, return count 0 for that item.
+    - NOT FOUND: If you truly cannot find a reviewer's item in ANY image, return count: 0 for that item.
     
     STEP 2: STAPLE AREA EVIDENCE
     - "exterior": Photo of the OUTSIDE of the store building (showing the front/entrance, parking lot, or storefront signs)
