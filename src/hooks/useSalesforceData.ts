@@ -517,10 +517,10 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
       const aiLayout = criticalFindings?.layout || {};
 
       const parsePhotoIndex = (val: any) => {
-        if (typeof val === 'number') return val;
+        if (typeof val === 'number') return val - 1;
         if (typeof val === 'string') {
           const match = val.match(/\d+/);
-          if (match) return parseInt(match[0], 10);
+          if (match) return parseInt(match[0], 10) - 1;
         }
         return -1;
       };

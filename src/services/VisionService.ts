@@ -144,7 +144,7 @@ export class VisionService {
     try {
       const parts: any[] = [prompt];
       imageParts.forEach((part, index) => {
-        parts.push(`Image Index: ${index}`);
+        parts.push(`Image Index: ${index + 1}`);
         parts.push(part);
       });
 
