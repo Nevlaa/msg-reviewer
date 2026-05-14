@@ -501,7 +501,8 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
 
       const inventoryParts = await Promise.all(inventoryPhotos.map(convertToPart));
       const expectedData = validationLog.results.food_inventory.map(i => ({ 
-        item: i.item, 
+        item: i.item,
+        expected: i.expected || '0',
         should_be_ffr: !!i.should_be_ffr 
       }));
       const inventoryFindings = await vision.analyzeInventory(inventoryParts, expectedData);

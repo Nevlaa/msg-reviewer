@@ -74,7 +74,7 @@ export class VisionService {
   /**
    * Batch 2: High-Variety Accumulator
    */
-   async analyzeInventory(imageParts: any[], expectedInventory: { item: string, should_be_ffr: boolean }[]): Promise<any> {
+   async analyzeInventory(imageParts: any[], expectedInventory: { item: string, expected: string, should_be_ffr: boolean }[]): Promise<any> {
     const prompt = `You are a SENIOR LEVEL 3 QC AUDITOR performing a USDA SNAP 3x3 or 10/10/10/14 VARIETY COUNT audit.
     
     CRITICAL TAXONOMY RULES:
@@ -114,10 +114,10 @@ export class VisionService {
 
     STEP 1: INVENTORY & UNIT COUNTING (CRITICAL)
     - You must perform a COMPREHENSIVE SCAN of the images and identify ALL staple food varieties present.
-    - Here is the Store Reviewer's reported list to verify (Item Name | Expected FFR Status):
-      ${expectedInventory.map(i => `- ${i.item} (Is FFR: ${i.should_be_ffr})`).join("\n      ")}
+    - Here is the Store Reviewer's reported list to verify (Item Name | Expected Count | Expected FFR Status):
+      ${expectedInventory.map(i => `- ${i.item} (Expected Count: ${i.expected} | Is FFR: ${i.should_be_ffr})`).join("\n      ")}
 
-    - TASK A: For EVERY variety in the reviewer's list above, find it and count the units in the images.
+    - TASK A: For EVERY variety in the reviewer's list above, find it and verify the counts in the images. Use the "Expected Count" as your search anchor—if the reviewer says "20+", look for a large quantity!
     - TASK B: Identify and count ANY OTHER staple food varieties visible in the images that are NOT on the list above. Add them to your findings.
     - CROSS-IMAGE AGGREGATION (CRITICAL): Items of the same variety are often spread across MULTIPLE images! You MUST look through ALL provided images before finalizing a count. Do NOT stop when you find an item in one image. If "Buns/Rolls" are in Image 5 (count: 4) and also in Image 12 (count: 6), aggregate them to count: 10!
     - FFR AGGREGATION: If you see 5 cans of Tuna (Shelf) and 2 bags of Frozen Tuna, the variety "Tuna" has a count of 7 and ffr_found=true.

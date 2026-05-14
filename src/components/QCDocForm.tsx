@@ -284,29 +284,29 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate }) => {
                       (String(item.actual_found || '').includes('+') && String(item.expected || '').includes('+')) ||
                       Math.abs(aiCountNum - sfCountNum) <= 3;
 
-                    const hasMatch = item.reviewer_missed || (item.match && item.ai_match_name);
-                    
                     // 3x3/Threshold compliance: At least 3 units (or high volume)
                     const meetsMinThreshold = aiCountNum >= 3 || String(item.actual_found || '').includes('+');
                     
                     const needsFFR = item.should_be_ffr;
                     const ffrOk = !needsFFR || item.ai_ffr_found;
                     
-                    // A row is "Verified" if there's a match, the count is close to the reviewer, AND FFR matches
-                    const rowPass = hasMatch && isCountClose && ffrOk;
+                    const isItemFound = !!item.ai_match_name;
+                    
+                    // A row is "Verified" if the item is found, the count is close to the reviewer, AND FFR matches
+                    const rowPass = isItemFound && isCountClose && ffrOk;
                     
                     return (
                       <tr key={idx} style={{ 
                         borderBottom: '1px solid #e2e8f0',
-                        background: item.reviewer_missed ? '#eff6ff' : (hasMatch ? (rowPass ? '#f0fdf4' : '#fefce8') : '#fef2f2')
+                        background: item.reviewer_missed ? '#eff6ff' : (isItemFound ? (rowPass ? '#f0fdf4' : '#fefce8') : '#fef2f2')
                       }}>
                         <td style={{ padding: '5px 6px', fontSize: '0.6rem', color: '#64748b' }}>{item.category}</td>
                         <td style={{ padding: '5px 6px' }}>
                           <strong>{item.reviewer_missed ? '--- (Missed)' : (item.item || 'Unknown')}</strong>
                           {!item.reviewer_missed && item.expected && <span style={{ color: '#94a3b8', fontSize: '0.6rem', marginLeft: '4px' }}>(exp: {item.expected})</span>}
                         </td>
-                        <td style={{ padding: '5px 6px', color: item.reviewer_missed ? '#2563eb' : (hasMatch ? '#059669' : '#dc2626'), fontStyle: (hasMatch || item.reviewer_missed) ? 'normal' : 'italic', fontWeight: item.reviewer_missed ? 'bold' : 'normal' }}>
-                          {item.reviewer_missed ? `AI Found: ${item.ai_match_name}` : (hasMatch ? item.ai_match_name : 'Not found in images')}
+                        <td style={{ padding: '5px 6px', color: item.reviewer_missed ? '#2563eb' : (isItemFound ? (isCountClose ? '#059669' : '#b45309') : '#dc2626'), fontStyle: (isItemFound || item.reviewer_missed) ? 'normal' : 'italic', fontWeight: item.reviewer_missed ? 'bold' : 'normal' }}>
+                          {item.reviewer_missed ? `AI Found: ${item.ai_match_name}` : (isItemFound ? item.ai_match_name : 'Not found in images')}
                         </td>
                         <td style={{ padding: '5px 6px', textAlign: 'center', fontWeight: 'bold' }}>
                           <span style={{ 
@@ -327,7 +327,7 @@ export const QCDocForm: React.FC<QCDocFormProps> = ({ data, onUpdate }) => {
                           )}
                         </td>
                         <td style={{ padding: '5px 6px', textAlign: 'center', fontSize: '0.85rem' }}>
-                          {hasMatch && meetsMinThreshold ? '✅' : '❌'}
+                          {isItemFound && meetsMinThreshold ? '✅' : '❌'}
                         </td>
                         <td style={{ padding: '5px 6px' }}>
                           {item.source_photo ? (
