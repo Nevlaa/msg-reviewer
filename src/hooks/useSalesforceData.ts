@@ -650,9 +650,10 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
         const isProduce = category === 'Fruit/Veg';
         const largeStoreThreshold = isProduce ? 14 : 10;
         
-        // If the reviewer entered more than 3 varieties, assume large store rules apply
+        // If the reviewer entered enough varieties to meet Large Store rules, hold them to that.
+        // Otherwise, floor it at the basic SNAP 3x3 requirement (3 varieties).
         const sfTotalEntered = updatedInventory.filter(i => i.category === category).length;
-        const requiredVarieties = sfTotalEntered > 3 ? largeStoreThreshold : 3;
+        const requiredVarieties = sfTotalEntered >= largeStoreThreshold ? largeStoreThreshold : 3;
 
         // Count AI-discovered varieties
         const catAliases: Record<string, string[]> = {
