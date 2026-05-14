@@ -105,11 +105,11 @@ export class VisionService {
     - You MUST use your vast pre-trained knowledge of global and international food brands to INFER the 1st and 2nd ingredients.
     - If you see foreign packaging (e.g., Mexican, Asian, European brands), identify the brand/product and categorize it based on what you know its primary ingredients are.
 
-    CATEGORIES:
-    1. "Bread/Cereals": Rice, Oats, Bread, Tortillas, Cereals, Pasta, Ramen, Baking Mix.
-    2. "Dairy": Milk - Dairy (Aggregated), Yogurt (Aggregated), Cheese, Butter, Eggs.
-    3. "Meat/Poultry/Fish": Beef, Chicken, Pork, Salmon, Tuna, Sardines, Jerky, SPAM.
-    4. "Fruit/Veg": Apples (or Apple Juice), Bananas, Oranges (or Orange Juice), Tomatoes (or Salsa/Paste), Potatoes, Canned Veg, Pickles.
+    CATEGORIES (USE THESE EXACT MASTER LIST NAMES):
+    1. Bread/Cereals: "Bread/Loaf Bread", "Cold Cereals", "Hot Cereals", "Infant Cereals", "Pasta/Ramen", "Rice", "Oats", "Buns/Rolls", "Tortillas", "Baking Mix", "Flour".
+    2. Dairy: "Milk (Dairy)", "Cheese (Dairy Based)", "Yogurt (Dairy Based)", "Butter", "Margarine", "Sour Cream", "Infant Formula", "Almond Milk" (or other plant milks).
+    3. Meat/Poultry/Fish: "Beef", "Chicken", "Pork", "Turkey", "Salmon", "Tuna", "Sardines", "Catfish", "Chicken Eggs", "Jerky".
+    4. Fruit/Veg: "Apples", "Bananas", "Oranges", "Tomatoes", "Potatoes", "Onions", "Carrots", "Lettuce", "Corn", "Beans", "Peas", "Cucumbers/Pickles", "Cabbage".
 
     STEP 1: INVENTORY & UNIT COUNTING (CRITICAL)
     - You must perform a COMPREHENSIVE SCAN of the images and identify ALL staple food varieties present.

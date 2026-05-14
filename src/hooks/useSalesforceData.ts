@@ -684,24 +684,43 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
         };
         const aliases = catAliases[category] || [];
         
-        const aiVarietiesForCat = aiInventory.filter((f: any) => {
-          if (f.category && f.category === category) return true;
+        const parseLocalCount = (c: any) => {
+          if (!c || c === 'Pending AI Scan') return 0;
+          if (typeof c === 'string' && c.includes('20+')) return 20;
+          if (typeof c === 'string' && c.includes('10+')) return 10;
+          const n = parseInt(c);
+          return isNaN(n) ? 0 : n;
+        };
+
+        const uniqueAiNames = new Set<string>();
+        const aiExtras = aiInventory.filter((f: any, idx: number) => {
+          if (usedAiIndices.has(idx)) return false;
           const fLower = (f.item || '').toLowerCase();
-          return aliases.some(alias => fLower.includes(alias));
+          const matchesCat = (f.category === category) || aliases.some(alias => fLower.includes(alias));
+          if (!matchesCat) return false;
+          
+          const count = parseLocalCount(f.count);
+          if (count < 3) return false; // Must be 3+ units to count as a valid variety
+
+          if (uniqueAiNames.has(fLower)) return false;
+          uniqueAiNames.add(fLower);
+          return true;
         });
 
         // The audit passes if the AI confirms at least the required number of varieties
         // User requested: large store estimate allows a 2-item margin of error
         const minPassing = requiredVarieties > 3 ? requiredVarieties - 2 : 3;
-        const totalVarieties = Math.max(sfVarieties.length, aiVarietiesForCat.length);
+        const totalVarieties = sfVarieties.length + aiExtras.length;
         const passed = totalVarieties >= minPassing;
 
-        const aiItemNames = aiVarietiesForCat.map((f: any) => f.item).slice(0, 5).join(', ');
+        const allConfirmedNames = [...sfVarieties.map(i => i.item), ...aiExtras.map((f: any) => f.item)];
+        const aiItemNames = allConfirmedNames.slice(0, 5).join(', ');
+        
         return {
           status: passed,
           reasoning: passed 
             ? `✅ ${totalVarieties} varieties confirmed (Req: ${requiredVarieties}${requiredVarieties > 3 ? ', Margin: ±2' : ''}). AI found: ${aiItemNames || 'N/A'}.` 
-            : `❌ Only ${totalVarieties} varieties found (Req: ${requiredVarieties}${requiredVarieties > 3 ? ', Margin: ±2' : ''}). SF items: ${sfVarieties.length}, AI items: ${aiVarietiesForCat.length}.`
+            : `❌ Only ${totalVarieties} varieties found (Req: ${requiredVarieties}${requiredVarieties > 3 ? ', Margin: ±2' : ''}). SF items: ${sfVarieties.length}, Extra AI items: ${aiExtras.length}.`
         };
       };
 
