@@ -99,6 +99,11 @@ export class VisionService {
     - CANNED GOODS: Look for cylindrical cans. Flat round cans are often Tuna. Oval tins are often Sardines. Standard cans may be Vegetables or Fruit. READ THE LABELS (e.g., Del Monte).
     - PICKLES/RELISH: Look for glass jars with greenish contents.
 
+    GLOBAL INGREDIENT INFERENCE (CRITICAL):
+    - You cannot see the back of the packages to read the ingredient lists. 
+    - You MUST use your vast pre-trained knowledge of global and international food brands to INFER the 1st and 2nd ingredients.
+    - If you see foreign packaging (e.g., Mexican, Asian, European brands), identify the brand/product and categorize it based on what you know its primary ingredients are.
+
     CATEGORIES:
     1. "Bread/Cereals": Rice, Oats, Bread, Tortillas, Cereals, Pasta, Ramen, Baking Mix.
     2. "Dairy": Milk - Dairy (Aggregated), Yogurt (Aggregated), Cheese, Butter, Eggs.
