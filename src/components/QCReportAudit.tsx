@@ -140,7 +140,7 @@ export const QCReportAudit: React.FC<QCReportAuditProps> = ({ report, onUpdateRe
                         <div key={idx} className="inventory-row-detailed">
                           <div className="item-meta">
                             <span className="variety-name">{item.variety}</span>
-                            <span className="unit-label">{item.unit_of_sale} | {item.is_ffr ? 'FFR' : 'Shelf'}</span>
+                            <span className="unit-label">{item.unit_of_sale} | {item.ffr ? 'FFR' : 'Shelf'}</span>
                           </div>
                           <div className="correction-input-group">
                             <span className="original-count">{item.count}</span>

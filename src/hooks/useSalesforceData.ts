@@ -158,25 +158,14 @@ export const useSalesforceData = ({ instanceUrl, bearerToken }: UseSalesforceDat
           console.log(`DEBUG: Checking Category[${catKey}] Field[${itemNameField}]:`, itemName);
           if (itemName && itemName !== 'None' && itemName !== '') {
             const isFFRChecked = !!(inventory as any)[itemFFRField];
-            const lowerItem = itemName.toLowerCase();
             
-            const isMandatoryFFR = lowerItem.includes('eggs') || 
-                                  lowerItem.includes('milk') || 
-                                  lowerItem.includes('beef') || 
-                                  lowerItem.includes('chicken') ||
-                                  lowerItem.includes('frozen') ||
-                                  lowerItem.includes('apple') ||
-                                  lowerItem.includes('banana') ||
-                                  lowerItem.includes('orange') ||
-                                  lowerItem.includes('tomato');
-
             foodResults.push({
               category: cat.label,
               item: itemName,
               expected: (inventory as any)[itemCountField] || 'Not Set',
               actual_found: "Pending AI Scan",
               ffr: isFFRChecked,
-              should_be_ffr: isMandatoryFFR,
+              should_be_ffr: isFFRChecked,
               match: true
             });
           }
