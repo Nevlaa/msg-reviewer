@@ -81,7 +81,7 @@ export class VisionService {
     - CATEGORIZATION: Use the "First Ingredient Rule" for mixed foods (must be 1st or 2nd ingredient).
     - THE CONSOLIDATION RULE: Aggregate different storage types (Canned vs. Frozen) into a SINGLE variety count. 
     - MEAT FORMATS: Tuna, Sardines, Beef, Pork, and Chicken can be Canned (Shelf), Fresh/Frozen (FFR), or Jerky/Meat Sticks. Look for ALL formats. SPAM, Armour Treet, and Vienna Sausages count as Pork, Beef, or Chicken.
-    - JERKY: Jerky counts as Beef, Pork, or Chicken IF it is the 1st or 2nd ingredient.
+    - JERKY: Jerky MUST be categorized as "Beef/Veal", "Pork", or "Chicken" based on its 1st or 2nd ingredient. NEVER output "Jerky" as the variety name.
     - GRAIN FORMATS: Bread/Cereals/Wheat processed foods can be Shelf-Stable (loaves, dry pasta, boxed cereal) OR Frozen/Refrigerated (FFR) (e.g., frozen waffles, frozen pizza crust, refrigerated tortillas, refrigerated pasta). Look in BOTH areas.
     - PRODUCE FORMATS: Fruit/Veg can be Fresh, Canned, Frozen (FFR), or 100% Juice.
     - JUICE RULE: 100% Juice counts. If you see fruit juices or drinks (like Aloe King, fruit nectars) that represent fruits (e.g., Peaches, Strawberries, Apples, Oranges), count them as those respective Fruit varieties.
@@ -109,7 +109,7 @@ export class VisionService {
     CATEGORIES (USE THESE EXACT MASTER LIST NAMES):
     1. Bread/Cereals: "Bread/Loaf Bread", "Cold Cereals", "Hot Cereals", "Infant Cereals", "Pasta/Ramen", "Rice", "Oats", "Buns/Rolls", "Tortillas", "Baking Mix", "Flour".
     2. Dairy: "Milk (Dairy)", "Cheese (Dairy Based)", "Yogurt (Dairy Based)", "Butter", "Margarine", "Sour Cream", "Infant Formula", "Almond Milk" (or other plant milks).
-    3. Meat/Poultry/Fish: "Beef", "Chicken", "Pork", "Turkey", "Salmon", "Tuna", "Sardines", "Catfish", "Chicken Eggs", "Jerky".
+    3. Meat/Poultry/Fish: "Beef/Veal", "Chicken", "Pork", "Turkey", "Salmon", "Tuna", "Sardines", "Catfish", "Chicken Eggs". (DO NOT use "Jerky" as a name).
     4. Fruit/Veg: "Apples", "Bananas", "Oranges", "Tomatoes", "Potatoes", "Onions", "Carrots", "Lettuce", "Corn", "Beans", "Peas", "Cucumbers/Pickles", "Cabbage".
 
     STEP 1: INVENTORY & UNIT COUNTING (CRITICAL)
